@@ -1,6 +1,7 @@
 // The living figure: one cloud of particles that re-forms into a different sculpture
-// for every section of the page (sphere, waveform, agent graph, syntax tree,
-// spreadsheet, galaxy, laboratory, database, helix, knot, dust and finally text).
+// for each section of the page. Every section reserves an empty column (.fig-slot);
+// the sculpture is measured into that column each frame, so it never covers text.
+// Sections without a slot (data-shape="none") simply fade the figure out.
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js";
 
@@ -10,6 +11,7 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const coarse = matchMedia("(pointer: coarse)").matches;
 const N = innerWidth < 760 || coarse ? 4600 : 9000;
 const TAU = Math.PI * 2;
+const DEBUG = new URLSearchParams(location.search).has("debug");
 
 /* ------------------------------------------------------------------ */
 /* Deterministic randomness                                            */
@@ -29,10 +31,10 @@ class Shape {
   constructor(seed) {
     this.r = rng(seed);
     this.pos = new Float32Array(N * 3);
-    this.row = new Float32Array(N);       // spreadsheet row (0 = top, 1 = bottom)
-    this.flow = new Float32Array(N);      // position along an agent-graph edge
-    this.node = new Float32Array(N).fill(-1); // agent-graph node id, -1 = edge/dust
-    this.hot = new Float32Array(N);       // highlighted points (vulnerable path, milestones)
+    this.row = new Float32Array(N);           // spreadsheet row (0 = top, 1 = bottom)
+    this.flow = new Float32Array(N);          // position along an agent-graph edge
+    this.node = new Float32Array(N).fill(-1); // agent-graph node id, -1 = edge
+    this.hot = new Float32Array(N);           // highlighted points
     this.i = 0;
   }
   get full() { return this.i >= N; }
@@ -54,20 +56,18 @@ class Shape {
     }
     this.i++;
   }
-  // Rotate every point (applied once, after building).
   rotate(ax, ay) {
     const cx = Math.cos(ax), sx = Math.sin(ax), cy = Math.cos(ay), sy = Math.sin(ay);
     for (let i = 0; i < N; i++) {
       const k = i * 3;
-      let x = this.pos[k], y = this.pos[k + 1], z = this.pos[k + 2];
+      const x = this.pos[k], y = this.pos[k + 1], z = this.pos[k + 2];
       const y1 = y * cx - z * sx, z1 = y * sx + z * cx;
-      const x2 = x * cy + z1 * sy, z2 = -x * sy + z1 * cy;
-      this.pos[k] = x2; this.pos[k + 1] = y1; this.pos[k + 2] = z2;
+      this.pos[k] = x * cy + z1 * sy; this.pos[k + 1] = y1; this.pos[k + 2] = -x * sy + z1 * cy;
     }
     return this;
   }
-  // Order points left to right so that morphing between shapes sweeps instead of exploding.
-  finish() {
+  // Order points left to right so morphs sweep instead of exploding, and measure the shape.
+  finish(extraHeight = 0) {
     const idx = Array.from({ length: N }, (_, i) => i);
     const key = new Float32Array(N);
     for (let i = 0; i < N; i++) key[i] = this.pos[i * 3] + (this.r() - 0.5) * 0.6;
@@ -78,6 +78,19 @@ class Shape {
       row[dst] = this.row[src]; flow[dst] = this.flow[src]; node[dst] = this.node[src]; hot[dst] = this.hot[src];
     });
     Object.assign(this, { pos, row, flow, node, hot });
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity, maxR = 0;
+    for (let i = 0; i < N; i++) {
+      const x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
+      minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+      maxR = Math.max(maxR, Math.hypot(x, z));
+    }
+    this.bounds = {
+      minX, maxX, minY, maxY, minZ, maxZ,
+      cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, w: maxX - minX, h: maxY - minY + extraHeight,
+      depth: Math.max(Math.abs(minZ), Math.abs(maxZ)), radius: maxR,
+    };
     return this;
   }
 }
@@ -86,7 +99,7 @@ class Shape {
 /* Sculptures                                                          */
 /* ------------------------------------------------------------------ */
 const builders = {
-  // A neural sphere: a lattice of nodes joined by arcs, over a soft shell.
+  // A neural sphere: a lattice of nodes joined by arcs, over a thin shell.
   sphere() {
     const s = new Shape(11), R = 2.45, nodes = [], M = 72;
     for (let k = 0; k < M; k++) {
@@ -99,14 +112,13 @@ const builders = {
         .filter((e) => e[0] !== i).sort((p, q) => p[1] - q[1]).slice(0, 3)
         .forEach(([j]) => { if (i < j) edges.push([i, j]); });
     });
-    const nEdge = N * 0.5, nNode = N * 0.16;
-    for (let k = 0; k < nEdge; k++) {
+    for (let k = 0; k < N * 0.5; k++) {
       const [i, j] = edges[k % edges.length], t = s.r(), a = nodes[i], b = nodes[j];
       const x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t, z = a[2] + (b[2] - a[2]) * t;
       const len = Math.hypot(x, y, z), lift = R * (1 + 0.07 * Math.sin(Math.PI * t));
       s.push((x / len) * lift, (y / len) * lift, (z / len) * lift);
     }
-    for (let k = 0; k < nNode; k++) {
+    for (let k = 0; k < N * 0.16; k++) {
       const a = nodes[k % M];
       s.push(a[0] + s.gauss() * 0.045, a[1] + s.gauss() * 0.045, a[2] + s.gauss() * 0.045, { hot: k % 9 === 0 ? 1 : 0 });
     }
@@ -121,14 +133,14 @@ const builders = {
   // A voice waveform: stacked ribbons that the shader sets in motion.
   wave() {
     const s = new Shape(21), L = 15;
-    while (s.i < N * 0.94) {
+    while (s.i < N * 0.95) {
       const layer = Math.floor(s.r() * L), z = (layer / (L - 1) - 0.5) * 2.6, x = (s.r() - 0.5) * 7.4;
       const env = Math.exp((-x * x) / 6.5);
       const y = env * (0.85 * Math.sin(1.6 * x + z * 1.1) + 0.32 * Math.sin(4.3 * x - z * 2.0)) * 0.95 + s.gauss() * 0.012;
       s.push(x, y, z);
     }
-    while (!s.full) s.push((s.r() - 0.5) * 7.6, s.gauss() * 1.1, (s.r() - 0.5) * 3);
-    return s.rotate(0.32, -0.25).finish();
+    while (!s.full) s.push((s.r() - 0.5) * 7.2, (s.r() - 0.5) * 2.4, (s.r() - 0.5) * 2.6);
+    return s.rotate(0.32, -0.25).finish(0.9);
   },
 
   // The agent's LangGraph: six node clusters joined by curved edges.
@@ -138,17 +150,15 @@ const builders = {
     const RAD = [0.34, 0.34, 0.4, 0.4, 0.3, 0.3];
     const W = [1, 1, 1.25, 1.25, 0.8, 0.8], wsum = W.reduce((a, b) => a + b, 0);
     const E = [[0, 1, 0.4], [1, 2, 0.4], [2, 3, 0.4], [3, 4, 0.55], [4, 2, 0.55], [3, 5, -0.45]];
-    const nNode = N * 0.5, nEdge = N * 0.44;
     for (let n = 0; n < 6; n++) {
-      const count = Math.round((nNode * W[n]) / wsum);
+      const count = Math.round((N * 0.52 * W[n]) / wsum);
       for (let k = 0; k < count; k++) {
         const th = TAU * s.r(), ph = Math.acos(2 * s.r() - 1), rad = RAD[n] * (0.82 + 0.18 * s.r());
         s.push(P[n][0] + rad * Math.sin(ph) * Math.cos(th), P[n][1] + rad * Math.cos(ph), P[n][2] + rad * Math.sin(ph) * Math.sin(th), { node: n });
       }
     }
-    for (let k = 0; k < nEdge; k++) {
-      const [a, b, lift] = E[k % E.length], t = s.r();
-      const A = P[a], B = P[b];
+    for (let k = 0; k < N * 0.44; k++) {
+      const [a, b, lift] = E[k % E.length], t = s.r(), A = P[a], B = P[b];
       const C = [(A[0] + B[0]) / 2 - (B[1] - A[1]) * 0.18, (A[1] + B[1]) / 2 + lift, (A[2] + B[2]) / 2 + 0.3];
       const u = 1 - t;
       s.push(
@@ -158,7 +168,7 @@ const builders = {
         { flow: t, node: -1 }
       );
     }
-    while (!s.full) s.push((s.r() - 0.5) * 8, (s.r() - 0.5) * 5, (s.r() - 0.5) * 3, { node: -2 });
+    while (!s.full) s.push(-3.2 + s.r() * 6.3, -1.6 + s.r() * 3.6, (s.r() - 0.5) * 1.6, { node: -2 });
     return s.rotate(0.12, 0).finish();
   },
 
@@ -183,49 +193,44 @@ const builders = {
     };
     layout(0);
     nodes.forEach((nd) => { nd.X = (nd.x / Math.max(1, leaf - 1) - 0.5) * 6.4; nd.Y = 2.3 - nd.depth * 0.98; });
-    // The vulnerable path: root to the deepest leaf in the right half.
     let deepest = 0;
     nodes.forEach((nd, i) => { if (nd.depth >= nodes[deepest].depth && nd.X > 0.4) deepest = i; });
     const hotSet = new Set();
     for (let i = deepest; i >= 0; i = nodes[i].parent) hotSet.add(i);
-    const nBlob = N * 0.36, nEdge = N * 0.6;
-    for (let k = 0; k < nBlob; k++) {
+    for (let k = 0; k < N * 0.37; k++) {
       const id = k % nodes.length, nd = nodes[id];
       s.push(nd.X + s.gauss() * 0.06, nd.Y + s.gauss() * 0.06, nd.z + s.gauss() * 0.06, { hot: hotSet.has(id) ? 1 : 0 });
     }
     const links = nodes.map((nd, i) => [nd.parent, i]).filter(([p]) => p >= 0);
-    for (let k = 0; k < nEdge; k++) {
+    for (let k = 0; k < N * 0.6; k++) {
       const [p, c] = links[k % links.length], t = s.r(), A = nodes[p], B = nodes[c];
       s.push(A.X + (B.X - A.X) * t, A.Y + (B.Y - A.Y) * t, A.z + (B.z - A.z) * t, { hot: hotSet.has(p) && hotSet.has(c) ? 1 : 0 });
     }
-    while (!s.full) s.push((s.r() - 0.5) * 8, (s.r() - 0.5) * 6, (s.r() - 0.5) * 3);
+    while (!s.full) s.push((s.r() - 0.5) * 6.4, -2.6 + s.r() * 4.9, (s.r() - 0.5) * 1.2);
     return s.finish();
   },
 
   // A spreadsheet in perspective; the shader runs a scan line down its rows.
   grid() {
     const s = new Shape(51), rows = 13, cols = 7, cw = 0.84, ch = 0.4, W = cols * cw, H = rows * ch;
-    const x0 = -W / 2, y0 = H / 2;
-    const hLen = (rows + 1) * W, vLen = (cols + 1) * H;
-    const nBorder = N * 0.46, nText = N * 0.5;
-    for (let k = 0; k < nBorder; k++) {
+    const x0 = -W / 2, y0 = H / 2, hLen = (rows + 1) * W, vLen = (cols + 1) * H;
+    for (let k = 0; k < N * 0.46; k++) {
       if (s.r() < hLen / (hLen + vLen)) {
-        const r = Math.floor(s.r() * (rows + 1)), y = y0 - r * ch;
-        s.push(x0 + s.r() * W, y, 0, { row: Math.min(1, r / rows) });
+        const r = Math.floor(s.r() * (rows + 1));
+        s.push(x0 + s.r() * W, y0 - r * ch, 0, { row: Math.min(1, r / rows) });
       } else {
         const c = Math.floor(s.r() * (cols + 1)), y = y0 - s.r() * H;
         s.push(x0 + c * cw, y, 0, { row: (y0 - y) / H });
       }
     }
-    // "Typed values": short strokes inside the cells, denser in the header row.
     const lens = [];
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) lens.push(0.25 + s.r() * 0.45);
-    for (let k = 0; k < nText; k++) {
+    for (let k = 0; k < N * 0.52; k++) {
       const r = s.r() < 0.14 ? 0 : 1 + Math.floor(s.r() * (rows - 1)), c = Math.floor(s.r() * cols);
       const len = lens[r * cols + c] * cw;
       s.push(x0 + c * cw + 0.1 + s.r() * len, y0 - (r + 0.5) * ch + s.gauss() * 0.02, s.gauss() * 0.01, { row: (r + 0.5) / rows, hot: r === 0 ? 1 : 0 });
     }
-    while (!s.full) s.push((s.r() - 0.5) * 8, (s.r() - 0.5) * 6, (s.r() - 0.5) * 2, { row: -1 });
+    while (!s.full) s.push(x0 + s.r() * W, y0 - s.r() * H, s.gauss() * 0.05, { row: -1 });
     return s.rotate(-0.92, 0.38).finish();
   },
 
@@ -275,7 +280,7 @@ const builders = {
     return s.rotate(0.26, 0).finish();
   },
 
-  // A double helix rising through time; four bright appointments.
+  // A double helix rising through time; four bright jobs.
   helix() {
     const s = new Shape(91), turns = 2.1, r = 1.25, ms = [0.12, 0.38, 0.64, 0.9];
     const at = (t, phase) => [Math.cos(t * TAU * turns + phase) * r, -2.6 + t * 5.2, Math.sin(t * TAU * turns + phase) * r];
@@ -291,27 +296,7 @@ const builders = {
       const p = at(ms[k % 4], 0);
       s.push(p[0] + s.gauss() * 0.11, p[1] + s.gauss() * 0.11, p[2] + s.gauss() * 0.11, { hot: 1 });
     }
-    while (!s.full) s.push(s.gauss() * 0.03, -2.8 + s.r() * 5.6, s.gauss() * 0.03);
-    return s.finish();
-  },
-
-  // A (2,3) torus knot: methods tied together.
-  knot() {
-    const s = new Shape(101), R = 1.6, rr = 0.66;
-    while (!s.full) {
-      const u = TAU * s.r(), q = 3, p = 2;
-      const x = (R + rr * Math.cos(q * u)) * Math.cos(p * u);
-      const y = (R + rr * Math.cos(q * u)) * Math.sin(p * u);
-      const z = rr * Math.sin(q * u);
-      s.push(x + s.gauss() * 0.13, y + s.gauss() * 0.13, z + s.gauss() * 0.13, { hot: s.r() < 0.04 ? 1 : 0 });
-    }
-    return s.finish();
-  },
-
-  // A wide, quiet cloud so the portrait and biography stay readable.
-  dust() {
-    const s = new Shape(111);
-    while (!s.full) s.push((s.r() - 0.5) * 13, (s.r() - 0.5) * 7.5, (s.r() - 0.5) * 5);
+    while (!s.full) s.push(s.gauss() * 0.03, -2.7 + s.r() * 5.4, s.gauss() * 0.03);
     return s.finish();
   },
 
@@ -328,19 +313,19 @@ const builders = {
     g.fillText("Say hello.", cw / 2, chh / 2 + 10);
     const data = g.getImageData(0, 0, cw, chh).data, pts = [];
     for (let y = 0; y < chh; y += 3) for (let x = 0; x < cw; x += 3) if (data[(y * cw + x) * 4 + 3] > 128) pts.push([x, y]);
-    const scale = 7.8 / cw;
     if (!pts.length) return builders.sphere();
+    const scale = 7.8 / cw;
     while (!s.full) {
       const [x, y] = pts[Math.floor(s.r() * pts.length)];
-      s.push((x - cw / 2 + s.r() * 3) * scale, -(y - chh / 2 + s.r() * 3) * scale + 0.95, s.gauss() * 0.05, { hot: s.r() < 0.05 ? 1 : 0 });
+      s.push((x - cw / 2 + s.r() * 3) * scale, -(y - chh / 2 + s.r() * 3) * scale, s.gauss() * 0.05, { hot: s.r() < 0.05 ? 1 : 0 });
     }
     return s.finish();
   },
 };
-const SPIN = { sphere: 0.07, galaxy: 0.05, cluster: 0.09, cylinder: 0.12, helix: 0.16, knot: 0.1, dust: 0.015 };
+const SPIN = { sphere: 0.07, galaxy: 0.05, cluster: 0.09, cylinder: 0.12, helix: 0.16 };
 const UNIFORM_FOR = { wave: "uWave", grid: "uScan", flow: "uFlow", galaxy: "uTwinkle" };
-// How strongly each sculpture lights its highlighted points (vulnerable path, milestones, header row...).
-const HOT = { tree: 1, helix: 1, grid: 0.55, sphere: 0.6, cluster: 0.55, galaxy: 0.7, cylinder: 0.6, knot: 0.6, text: 0.5 };
+const TILT = { text: 0.03 };
+const HOT = { tree: 1, helix: 1, grid: 0.55, sphere: 0.6, cluster: 0.55, galaxy: 0.7, cylinder: 0.6, text: 0.5 };
 
 /* ------------------------------------------------------------------ */
 /* Renderer                                                            */
@@ -364,7 +349,6 @@ if (renderer) {
   const cache = {};
   const shape = (name) => (cache[name] ||= (builders[name] || builders.sphere)());
 
-  // Geometry: rendered positions plus per-point attributes.
   const geo = new THREE.BufferGeometry();
   const render = new Float32Array(N * 3);
   const cur = new Float32Array(N * 3);
@@ -375,11 +359,10 @@ if (renderer) {
     rand[i] = r0();
     accent[i] = r0() < 0.045 ? 1 : 0;
     speed[i] = 0.022 + rand[i] * 0.05;
-    // Intro: start scattered far away and assemble.
-    const th = TAU * r0(), ph = Math.acos(2 * r0() - 1), rad = 9 + r0() * 6;
-    cur[i * 3] = rad * Math.sin(ph) * Math.cos(th);
-    cur[i * 3 + 1] = rad * Math.cos(ph);
-    cur[i * 3 + 2] = rad * Math.sin(ph) * Math.sin(th) - 4;
+    // Intro: start as a small seed in the middle of the figure's own column and grow.
+    cur[i * 3] = (r0() - 0.5) * 0.4;
+    cur[i * 3 + 1] = (r0() - 0.5) * 0.4;
+    cur[i * 3 + 2] = (r0() - 0.5) * 0.4;
   }
   const attr = (arr, size) => new THREE.BufferAttribute(arr, size);
   geo.setAttribute("position", attr(render, 3).setUsage(THREE.DynamicDrawUsage));
@@ -398,7 +381,8 @@ if (renderer) {
     uInk: { value: new THREE.Color() },
     uAccent: { value: new THREE.Color() },
     uAlpha: { value: 1 },
-    uDim: { value: 1 },
+    uDim: { value: 0 },
+    uScale: { value: 1 },
     uWave: { value: 0 }, uScan: { value: 0 }, uFlow: { value: 0 }, uHot: { value: 0 }, uTwinkle: { value: 0 },
     uActiveNode: { value: -10 }, uNodePulse: { value: 0 },
   };
@@ -408,7 +392,7 @@ if (renderer) {
     transparent: true,
     depthWrite: false,
     vertexShader: /* glsl */ `
-      uniform float uTime, uSize, uPixelRatio, uAlpha, uDim;
+      uniform float uTime, uSize, uPixelRatio, uAlpha, uDim, uScale;
       uniform float uWave, uScan, uFlow, uHot, uTwinkle, uActiveNode, uNodePulse;
       uniform vec3 uInk, uAccent;
       attribute float aRand, aAccent, aRow, aFlow, aNode, aHot;
@@ -432,7 +416,8 @@ if (renderer) {
 
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
-        float size = uSize * (0.55 + aRand * 0.9) * (1.0 + glow * 1.4) * max(twinkle, 0.2);
+        // Point size follows the figure's scale so small columns get finer particles.
+        float size = uSize * clamp(uScale, 0.8, 1.25) * (0.55 + aRand * 0.9) * (1.0 + glow * 1.4) * max(twinkle, 0.2);
         gl_PointSize = size * uPixelRatio / -mv.z;
         float a = max(aAccent * 0.9, glow);
         vColor = mix(uInk, uAccent, a);
@@ -453,30 +438,145 @@ if (renderer) {
   points.frustumCulled = false;
   group.add(points);
 
-  /* ---------- Editions ---------- */
-  function applyEdition() {
+  /* ---------- Light / dark ---------- */
+  function applyMode() {
     const dark = root.dataset.theme === "dark";
     uniforms.uInk.value.set(dark ? "#efe7d6" : "#1b1a24");
     uniforms.uAccent.value.set(dark ? "#ff6b4f" : "#b8321e");
-    uniforms.uAlpha.value = dark ? 0.62 : 0.78;
-    uniforms.uSize.value = dark ? 28 : 30;
+    uniforms.uAlpha.value = dark ? 0.66 : 0.85;
+    uniforms.uSize.value = dark ? 30 : 34;
     material.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
     material.needsUpdate = true;
   }
-  applyEdition();
-  addEventListener("editionchange", applyEdition);
+  applyMode();
+  addEventListener("editionchange", applyMode);
 
-  /* ---------- Sections drive the figure ---------- */
+  /* ---------- Fitting the sculpture into a section's slot ---------- */
   const sections = [...document.querySelectorAll("[data-shape]")];
-  let active = null, targetName = null, target = null;
-  const state = { x: 0, y: 0, scale: 1, dim: 1, rotY: 0 };
-  const goal = { x: 0, y: 0, scale: 1, dim: 1 };
-  const weights = { uWave: 0, uScan: 0, uFlow: 0, uHot: 0, uTwinkle: 0 };
-
+  const railVisible = () => innerWidth >= 1520;   // same breakpoint as .toc in style.css
+  const slotOf = (el) => {
+    if (!el || el.dataset.shape === "none") return null;
+    const slot = el.querySelector(".fig-slot");
+    if (!slot) return null;
+    const r = slot.getBoundingClientRect();
+    if (r.width <= 4 || r.height <= 4) return null;
+    // On wide screens the page margin beside the slot is empty, so let the figure use it
+    // (only on the side away from the text; the nav rail keeps its strip on the left).
+    let left = r.left, right = r.right;
+    const text = el.querySelector(".split-text, .paper-text");
+    if (text && innerWidth >= 900) {
+      const tr = text.getBoundingClientRect();
+      if (r.left >= tr.right) right = Math.max(right, innerWidth - 40);
+      else if (r.right <= tr.left) left = Math.min(left, railVisible() ? 88 : 40);
+    }
+    return { left, right, top: r.top, bottom: r.bottom, width: right - left, height: r.height };
+  };
   function visibleSize() {
     const h = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     return { w: h * camera.aspect, h };
   }
+  // Sample points (with the extremes of every axis) used to measure a shape on screen.
+  const sampleCache = {};
+  function samplesOf(name) {
+    if (sampleCache[name]) return sampleCache[name];
+    const sh = shape(name), pts = [], p = sh.pos;
+    const ext = [[0, 1], [0, -1], [1, 1], [1, -1], [2, 1], [2, -1]];
+    for (const [axis, sign] of ext) {
+      let best = 0;
+      for (let i = 1; i < N; i++) if (sign * p[i * 3 + axis] > sign * p[best * 3 + axis]) best = i;
+      pts.push(p[best * 3], p[best * 3 + 1], p[best * 3 + 2]);
+    }
+    const step = Math.max(1, Math.floor(N / 320));
+    for (let i = 0; i < N; i += step) pts.push(p[i * 3], p[i * 3 + 1], p[i * 3 + 2]);
+    // Morphs travel inside the shape's box (see remapInto), so measure the box itself too:
+    // its eight corners, or for spinning shapes the rims of the cylinder it sweeps.
+    const bb = sh.bounds, lift = name === "wave" ? 0.45 : 0;
+    if (SPIN[name]) {
+      for (let k = 0; k < 24; k++) {
+        const a = (k / 24) * TAU, x = Math.cos(a) * bb.radius, z = Math.sin(a) * bb.radius;
+        pts.push(x, bb.minY, z, x, bb.maxY, z);
+      }
+    } else {
+      for (const x of [bb.minX, bb.maxX]) for (const y of [bb.minY - lift, bb.maxY + lift]) for (const z of [bb.minZ, bb.maxZ]) pts.push(x, y, z);
+    }
+    // The waveform also moves vertically in the shader; include its reach.
+    if (name === "wave") {
+      const n = pts.length;
+      for (let k = 0; k < n; k += 3) pts.push(pts[k], pts[k + 1] + 0.45, pts[k + 2], pts[k], pts[k + 1] - 0.45, pts[k + 2]);
+    }
+    return (sampleCache[name] = new Float32Array(pts));
+  }
+  // Screen-space box of a shape for a given placement, over every rotation it can take.
+  function measure(name, x, y, s) {
+    const pts = samplesOf(name), spin = !!SPIN[name], tilt = coarse || reducedMotion ? 0 : (TILT[name] ?? 0.12);
+    const d = camera.position.z, ty = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), tx = ty * camera.aspect;
+    const ys = spin ? [0, 0.785, 1.571, 2.356, 3.142, 3.927, 4.712, 5.498] : [-tilt, 0, tilt];
+    const xs = tilt ? [-tilt * 0.6, tilt * 0.6] : [0];
+    let l = Infinity, r = -Infinity, t = Infinity, b = -Infinity;
+    for (const ay of ys) for (const ax of xs) {
+      const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+      for (let i = 0; i < pts.length; i += 3) {
+        const px = pts[i] * s, py = pts[i + 1] * s, pz = pts[i + 2] * s;
+        const x1 = px * cy + pz * sy, z1 = -px * sy + pz * cy;     // rotate around Y
+        const y2 = py * cx - z1 * sx, z2 = py * sx + z1 * cx;      // then around X
+        const wx = x1 + x, wy = y2 + y, depth = d - z2;
+        const sxp = ((wx / depth) / tx + 1) / 2 * innerWidth, syp = (1 - (wy / depth) / ty) / 2 * innerHeight;
+        if (sxp < l) l = sxp; if (sxp > r) r = sxp; if (syp < t) t = syp; if (syp > b) b = syp;
+      }
+    }
+    return { l, r, t, b, w: r - l, h: b - t, cx: (l + r) / 2, cy: (t + b) / 2 };
+  }
+  function fit(rect, name) {
+    const vis = visibleSize(), perPx = vis.w / innerWidth;
+    const pad = 6, availW = rect.width - pad * 2, availH = Math.min(rect.height, innerHeight * 0.82) - pad * 2;
+    const toWorld = (px, py) => [(px - innerWidth / 2) * perPx, -(py - innerHeight / 2) * perPx];
+    const wantX = rect.left + rect.width / 2;
+    const key = `${name}|${Math.round(rect.width)}|${Math.round(rect.height)}|${innerWidth}|${innerHeight}`;
+    let s = fitCache.get(key), m = null, [x, y] = toWorld(wantX, innerHeight / 2);
+    if (s === undefined) {
+      // Scale until the measured box fits (only when the slot or window size changes).
+      s = 1;
+      for (let it = 0; it < 4; it++) {
+        m = measure(name, x, y, s);
+        s *= Math.min(availW / m.w, availH / m.h);
+        m = measure(name, x, y, s);
+        x += (wantX - m.cx) * perPx;
+        y -= (innerHeight / 2 - m.cy) * perPx;
+      }
+      m = measure(name, x, y, s);
+      if (m.w > availW + 0.5 || m.h > availH + 0.5) s *= Math.min(availW / m.w, availH / m.h) * 0.99;
+      fitCache.set(key, s);
+    }
+    // Position: centre the measured box in the slot (sticky to the middle of the screen).
+    const place = () => {
+      for (let it = 0; it < 3; it++) {
+        m = measure(name, x, y, s);
+        const wantY = Math.max(rect.top + pad + m.h / 2, Math.min(rect.bottom - pad - m.h / 2, innerHeight / 2));
+        x += (wantX - m.cx) * perPx;
+        y -= (wantY - m.cy) * perPx;
+      }
+      m = measure(name, x, y, s);
+    };
+    place();
+    // Off-centre, perspective enlarges the shape slightly; shrink for this frame if it pokes out.
+    for (let it = 0; it < 3; it++) {
+      const over = Math.max(
+        m.w / availW, m.h / availH,
+        (rect.top + pad - m.t) > 0.5 || (m.b - (rect.bottom - pad)) > 0.5 || (rect.left + pad - m.l) > 0.5 || (m.r - (rect.right - pad)) > 0.5 ? 1.0001 : 0
+      );
+      if (over <= 1) break;
+      const k = Math.min(
+        availW / m.w, availH / m.h,
+        (rect.bottom - pad - (rect.top + pad)) / Math.max(1, m.b - m.t + Math.max(0, rect.top + pad - m.t) + Math.max(0, m.b - (rect.bottom - pad)))
+      );
+      s *= Math.min(0.995, k);
+      place();
+    }
+    return { x, y, s };
+  }
+  const fitCache = new Map();
+
+  let targetName = null, target = null;
   function setTarget(name) {
     if (name === targetName) return;
     targetName = name;
@@ -486,27 +586,33 @@ if (renderer) {
     geo.attributes.aNode.array.set(target.node); geo.attributes.aNode.needsUpdate = true;
     geo.attributes.aHot.array.set(target.hot); geo.attributes.aHot.needsUpdate = true;
   }
-  function layoutFor(el) {
-    const { w } = visibleSize();
-    const wide = innerWidth >= 900;
-    const side = wide ? el.dataset.side || "center" : "center";
-    const shift = el.classList.contains("hero") ? 0.27 : side === "left" ? 0.225 : 0.25;
-    goal.x = side === "right" ? w * shift : side === "left" ? -w * shift : 0;
-    goal.y = 0;
-    goal.scale = side === "center" ? Math.min(1.08, (w * 0.9) / 8) : Math.min(1.0, (w * 0.41) / 6.8);
-    if (!wide) goal.scale = Math.min(1, (w * 0.98) / 7.6);
-    goal.dim = parseFloat(el.dataset.dim || "1");
+  // Squeeze the current cloud into the new shape's box (done while invisible), so every
+  // in-between frame of the morph is a blend of two shapes that both fit the slot.
+  function remapInto(nb, spin) {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, z0 = Infinity, z1 = -Infinity, rc = 0;
+    for (let i = 0; i < N; i++) {
+      const j = i * 3, x = cur[j], y = cur[j + 1], z = cur[j + 2];
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      z0 = Math.min(z0, z); z1 = Math.max(z1, z); rc = Math.max(rc, Math.hypot(x, z));
+    }
+    const map = (v, a0, a1, b0, b1) => (a1 - a0 < 1e-6 ? (b0 + b1) / 2 : b0 + ((v - a0) / (a1 - a0)) * (b1 - b0));
+    const k = spin && rc > 1e-6 ? nb.radius / rc : 1;
+    for (let i = 0; i < N; i++) {
+      const j = i * 3;
+      if (spin) { cur[j] *= k; cur[j + 2] *= k; }
+      else { cur[j] = map(cur[j], x0, x1, nb.minX, nb.maxX); cur[j + 2] = map(cur[j + 2], z0, z1, nb.minZ, nb.maxZ); }
+      cur[j + 1] = map(cur[j + 1], y0, y1, nb.minY, nb.maxY);
+      off[j] = off[j + 1] = off[j + 2] = 0;
+    }
   }
-  function pickSection() {
+
+  function activeSection() {
     const mid = innerHeight * 0.5;
-    let found = null;
     for (const el of sections) {
       const r = el.getBoundingClientRect();
-      if (r.top <= mid && r.bottom > mid) { found = el; break; }
+      if (r.top <= mid && r.bottom > mid) return el;
     }
-    if (!found) return;
-    if (found !== active) { active = found; setTarget(found.dataset.shape); }
-    layoutFor(found);
+    return null;
   }
 
   /* ---------- Pointer ---------- */
@@ -518,35 +624,68 @@ if (renderer) {
     if (e.pointerType === "mouse") pointerActive = performance.now();
   }, { passive: true });
 
-  /* ---------- Agent console pulses ---------- */
   addEventListener("agentstep", (e) => {
     uniforms.uActiveNode.value = e.detail.node;
     uniforms.uNodePulse.value = 1;
   });
 
-  /* ---------- Resize ---------- */
   function resize() {
     renderer.setSize(innerWidth, innerHeight, false);
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-    if (active) layoutFor(active);
   }
   addEventListener("resize", resize);
   resize();
 
-  /* ---------- Loop ---------- */
+  /* ---------- State ---------- */
+  let shown = null;          // section whose slot the figure currently occupies
+  let pending = null;        // section we are moving to (after fading out)
+  const st = { dim: 0, rotY: 0 };
+  const weights = { uWave: 0, uScan: 0, uFlow: 0, uHot: 0, uTwinkle: 0 };
   const clock = new THREE.Clock();
   const local = new THREE.Vector3();
   let last = 0;
+
+  let frameMs = 0;
   function frame() {
+    const f0 = performance.now();
     const t = clock.getElapsedTime();
     const dt = Math.min(0.05, t - last || 0.016);
     last = t;
     const k60 = dt * 60;
-    pickSection();
+
+    // 1. Which section is in charge, and should we move there?
+    const act = activeSection();
+    if (act && act !== shown && act !== pending) pending = act;
+    if (pending) {
+      if (!shown || st.dim < 0.04 || reducedMotion) {
+        shown = pending; pending = null;
+        if (slotOf(shown)) {
+          setTarget(shown.dataset.shape);
+          remapInto(target.bounds, !!SPIN[targetName]);
+          // The figure is invisible at this moment: face the camera now rather than turning in view.
+          if (!SPIN[targetName]) st.rotY = Math.round(st.rotY / TAU) * TAU;
+        }
+      }
+    }
     if (!target) setTarget("sphere");
 
-    // Morph toward the target sculpture, each particle at its own pace.
+    // 2. Place the figure in its slot (rigidly, so it scrolls with the page).
+    const rect = slotOf(shown);
+    let goalDim = 0;
+    if (rect && shown.dataset.shape === targetName) {
+      const f = fit(rect, targetName);
+      group.position.set(f.x, f.y, 0);
+      group.scale.setScalar(f.s);
+      uniforms.uScale.value = f.s;
+      goalDim = 1;
+    }
+    if (pending) st.dim *= Math.pow(0.72, k60);                       // quick fade out before moving
+    else st.dim += (goalDim - st.dim) * (reducedMotion ? 1 : Math.min(1, 0.07 * k60));
+    uniforms.uDim.value = st.dim;
+    points.visible = st.dim > 0.005;
+
+    // 3. Morph toward the target sculpture, each particle at its own pace.
     const tp = target.pos;
     if (reducedMotion) cur.set(tp);
     else for (let i = 0; i < N; i++) {
@@ -556,13 +695,14 @@ if (renderer) {
       cur[j + 2] += (tp[j + 2] - cur[j + 2]) * s;
     }
 
-    // Cursor disturbance (mouse only), in the group's local space.
-    const repel = !reducedMotion && performance.now() - pointerActive < 1800;
+    // 4. Cursor disturbance (mouse only), limited so particles stay in their column.
+    const repel = !reducedMotion && st.dim > 0.3 && performance.now() - pointerActive < 1800;
     if (repel) {
       ray.setFromCamera(ndc, camera);
       if (ray.ray.intersectPlane(plane, hit)) { local.copy(hit); group.worldToLocal(local); }
     }
-    const decay = Math.pow(0.9, k60), R = 0.95, R2 = R * R;
+    const decay = Math.pow(0.9, k60), R = 0.9, R2 = R * R, MAXO = 0.35;
+    const cb = target.bounds, spinNow = !!SPIN[targetName];
     for (let i = 0; i < N; i++) {
       const j = i * 3;
       let ox = off[j] * decay, oy = off[j + 1] * decay, oz = off[j + 2] * decay;
@@ -570,24 +710,29 @@ if (renderer) {
         const dx = cur[j] + ox - local.x, dy = cur[j + 1] + oy - local.y, dz = cur[j + 2] + oz - local.z;
         const d2 = dx * dx + dy * dy + dz * dz;
         if (d2 < R2 && d2 > 1e-6) {
-          const d = Math.sqrt(d2), f = ((R - d) / R) * 0.16 * k60;
+          const d = Math.sqrt(d2), f = ((R - d) / R) * 0.12 * k60;
           ox += (dx / d) * f; oy += (dy / d) * f; oz += (dz / d) * f;
+          const m = Math.hypot(ox, oy, oz);
+          if (m > MAXO) { ox *= MAXO / m; oy *= MAXO / m; oz *= MAXO / m; }
         }
       }
       off[j] = ox; off[j + 1] = oy; off[j + 2] = oz;
-      render[j] = cur[j] + ox; render[j + 1] = cur[j + 1] + oy; render[j + 2] = cur[j + 2] + oz;
+      let rx = cur[j] + ox, ry = cur[j + 1] + oy, rz = cur[j + 2] + oz;
+      if (repel || ox || oy || oz) {
+        ry = Math.min(cb.maxY, Math.max(cb.minY, ry));
+        if (spinNow) {
+          const rr = Math.hypot(rx, rz);
+          if (rr > cb.radius) { rx *= cb.radius / rr; rz *= cb.radius / rr; }
+        } else {
+          rx = Math.min(cb.maxX, Math.max(cb.minX, rx));
+          rz = Math.min(cb.maxZ, Math.max(cb.minZ, rz));
+        }
+      }
+      render[j] = rx; render[j + 1] = ry; render[j + 2] = rz;
     }
     geo.attributes.position.needsUpdate = true;
 
-    // Ease layout, shape-specific effects and rotation.
-    const e = reducedMotion ? 1 : Math.min(1, 0.06 * k60);
-    state.x += (goal.x - state.x) * e;
-    state.y += (goal.y - state.y) * e;
-    state.scale += (goal.scale - state.scale) * e;
-    state.dim += (goal.dim - state.dim) * e;
-    group.position.set(state.x, state.y, 0);
-    group.scale.setScalar(state.scale);
-    uniforms.uDim.value = state.dim;
+    // 5. Shape-specific effects and rotation.
     for (const [shapeName, u] of Object.entries(UNIFORM_FOR)) {
       const want = targetName === shapeName ? 1 : 0;
       weights[u] += (want - weights[u]) * Math.min(1, 0.08 * k60);
@@ -598,22 +743,40 @@ if (renderer) {
     uniforms.uNodePulse.value *= Math.pow(0.985, k60);
 
     const spin = SPIN[targetName];
-    if (spin && !reducedMotion) state.rotY += spin * dt;
-    else state.rotY += (Math.round(state.rotY / TAU) * TAU - state.rotY) * e;
+    if (spin && !reducedMotion) st.rotY += spin * dt;
+    else st.rotY += (Math.round(st.rotY / TAU) * TAU - st.rotY) * Math.min(1, 0.06 * k60);
     parallax.x += (ndc.x - parallax.x) * 0.04 * k60;
     parallax.y += (ndc.y - parallax.y) * 0.04 * k60;
-    group.rotation.y = state.rotY + (coarse ? 0 : parallax.x * 0.22);
-    group.rotation.x = coarse ? 0 : -parallax.y * 0.12;
+    const tilt = coarse || reducedMotion ? 0 : (TILT[targetName] ?? 0.12);
+    group.rotation.y = st.rotY + parallax.x * tilt;
+    group.rotation.x = -parallax.y * tilt * 0.6;
 
     uniforms.uTime.value = reducedMotion ? 4 : t;
     renderer.render(scene, camera);
+    frameMs = frameMs * 0.9 + (performance.now() - f0) * 0.1;
   }
 
-  // Build the closing text after the font has loaded, so it is set in Times New Roman.
-  const fontReady = document.fonts && document.fonts.load
-    ? document.fonts.load('italic 300px "Times New Roman"').catch(() => null).then(() => document.fonts.ready)
-    : Promise.resolve();
-  fontReady.then(() => { delete cache.text; });
+  // Build the closing text once the font is ready, so it is set in Times New Roman.
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('italic 300px "Times New Roman"').catch(() => null).then(() => document.fonts.ready).then(() => {
+      if (targetName !== "text") delete cache.text;
+    });
+  }
+
+  // Test hook (only with ?debug): the on-screen box covered by the visible particles.
+  if (DEBUG) {
+    window.__figure = () => {
+      group.updateMatrixWorld(true);
+      const v = new THREE.Vector3();
+      let l = Infinity, r = -Infinity, tp = Infinity, b = -Infinity;
+      for (let i = 0; i < N; i += 2) {
+        v.set(render[i * 3], render[i * 3 + 1], render[i * 3 + 2]).applyMatrix4(group.matrixWorld).project(camera);
+        const x = (v.x + 1) / 2 * innerWidth, y = (1 - v.y) / 2 * innerHeight;
+        l = Math.min(l, x); r = Math.max(r, x); tp = Math.min(tp, y); b = Math.max(b, y);
+      }
+      return { shape: targetName, dim: st.dim, section: shown && shown.id, frameMs, box: { left: l, top: tp, right: r, bottom: b } };
+    };
+  }
 
   renderer.setAnimationLoop(frame);
   document.addEventListener("visibilitychange", () => renderer.setAnimationLoop(document.hidden ? null : frame));

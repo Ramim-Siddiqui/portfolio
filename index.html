@@ -51,96 +51,99 @@
 <div class="grain" aria-hidden="true"></div>
 
 <header class="nav" id="nav">
-  <a class="nav-mark" href="#top" aria-label="Back to top"><em>R. A. Siddiqui</em></a>
-  <nav class="nav-links" id="nav-links" aria-label="Sections">
-    <a href="#work">Work</a>
-    <a href="#experience">Experience</a>
-    <a href="#index">Index</a>
-    <a href="#author">Author</a>
-    <a href="#contact">Contact</a>
-  </nav>
-  <div class="nav-tools">
-    <button class="edition" id="edition" type="button" aria-label="Switch between light and dark edition"><span class="edition-dot" aria-hidden="true"></span><span id="edition-label">Night edition</span></button>
-    <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
+  <div class="nav-in">
+    <a class="nav-mark" href="#top" aria-label="Back to top"><em>R. A. Siddiqui</em></a>
+    <nav class="nav-links" id="nav-links" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-tools">
+      <button class="edition" id="edition" type="button" aria-label="Switch between light and dark mode"><span class="edition-dot" aria-hidden="true"></span><span id="edition-label">Dark mode</span></button>
+      <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
+    </div>
   </div>
 </header>
 
-<aside class="toc" id="toc" aria-label="Table of contents"></aside>
+<aside class="toc" id="toc" aria-label="Page sections"></aside>
 
 <main>
 <!-- ============================ HERO ============================ -->
-<section class="hero" id="top" data-shape="sphere" data-side="right">
-  <div class="wrap">
-    <div class="folio reveal">
-      <span>Vol. I · No. 1</span>
-      <span class="folio-mid">An interactive portfolio</span>
-      <span>Karachi · MMXXVI</span>
+<section class="hero" id="top" data-shape="sphere" data-toc="Introduction">
+  <div class="wrap split">
+    <div class="split-text">
+      <p class="kicker reveal">The work of</p>
+      <h1 class="name reveal">Ramim Ali<br><em>Siddiqui<span class="dot">.</span></em></h1>
+      <p class="dek reveal">AI/ML engineer. I build systems that listen, reason and act: voice agents, LLM workflows and graph neural networks, and the data pipelines that keep them running in production.</p>
+      <div class="actions reveal">
+        <a class="btn btn-ink" href="#work">See the work</a>
+        <a class="btn" href="assets/Ramim_Ali_Siddiqui_CV.pdf" download>Download CV <span class="muted">(PDF)</span></a>
+        <a class="btn btn-quiet" href="#contact">Get in touch</a>
+      </div>
+      <dl class="hero-meta reveal">
+        <div><dt>Currently</dt><dd>AI Engineer, Gems Pathways</dd></div>
+        <div><dt>Education</dt><dd>B.S. Computer Science, Sukkur IBA University</dd></div>
+        <div><dt>Based in</dt><dd>Karachi, Pakistan</dd></div>
+      </dl>
     </div>
-    <p class="kicker reveal">The work of</p>
-    <h1 class="name reveal">Ramim Ali<br><em>Siddiqui<span class="dot">.</span></em></h1>
-    <p class="dek reveal">AI/ML engineer. I build systems that listen, reason and act: voice agents, LLM workflows and graph neural networks, and the data pipelines that keep them running in production.</p>
-    <div class="actions reveal">
-      <a class="btn btn-ink" href="#work">Read the work</a>
-      <a class="btn" href="assets/Ramim_Ali_Siddiqui_CV.pdf" download>Download CV <span class="muted">(PDF)</span></a>
-      <a class="btn btn-quiet" href="#contact">Get in touch</a>
-    </div>
-    <dl class="hero-meta reveal">
-      <div><dt>Currently</dt><dd>AI Engineer, Gems Pathways</dd></div>
-      <div><dt>Trained</dt><dd>B.S. Computer Science, Sukkur IBA University</dd></div>
-      <div><dt>Based</dt><dd>Karachi, Pakistan</dd></div>
-    </dl>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
-  <p class="figcap figcap-hero"><strong>Fig. 1.</strong> A living figure. Thousands of particles that re-form into each project as you read. Move your cursor through them.</p>
 </section>
 
-<!-- ============================ ABSTRACT ============================ -->
-<section class="section abstract" id="abstract" data-shape="sphere" data-side="center" data-dim="0.28" data-toc="¶ Abstract">
+<!-- ============================ SUMMARY ============================ -->
+<section class="section summary" id="summary" data-shape="none" data-toc="Summary">
   <div class="wrap grid-2">
     <div class="reveal">
-      <h2 class="h-label">Abstract</h2>
-      <p class="lede">An AI/ML engineer working where machine learning meets production engineering. Recent work spans tool-calling voice agents, LangGraph workflows with self-review, graph neural networks for source-code security, browser automation, and enterprise ETL. The common thread is shipping: every system below either runs live or is open to read.</p>
-      <p class="keywords"><em>Keywords:</em> voice agents, LLM agents, retrieval-augmented generation, graph neural networks, deep learning, FastAPI, data engineering, MLOps.</p>
+      <h2 class="h-label">Summary</h2>
+      <p class="lede">An AI/ML engineer working where machine learning meets production engineering. Recent work spans tool-calling voice agents, LangGraph workflows that review their own output, graph neural networks for source-code security, browser automation and enterprise ETL. The common thread is shipping: every project below either runs live or is open to read.</p>
       <h3 class="h-label h-label-sm">Key figures</h3>
       <ul class="figures">
-        <li><span class="fig-num">93.0%</span><span class="fig-txt">test accuracy of the graph-neural-network vulnerability detector <a class="ref" href="#gnn">1.3</a></span></li>
-        <li><span class="fig-num">101</span><span class="fig-txt">automated tests behind the voice registration agent <a class="ref" href="#voice-agent">1.1</a></span></li>
-        <li><span class="fig-num">≈2 s</span><span class="fig-txt">warm response time of the live support-ticket agent <a class="ref" href="#support-agent">1.2</a></span></li>
-        <li><span class="fig-num">100k</span><span class="fig-txt">repositories the stars crawler is designed to index <a class="ref" href="#crawler">1.5</a></span></li>
+        <li><span class="fig-num">93.0%</span><a class="fig-txt" href="#gnn">test accuracy of the graph-neural-network vulnerability detector</a></li>
+        <li><span class="fig-num">101</span><a class="fig-txt" href="#voice-agent">automated tests behind the voice registration agent</a></li>
+        <li><span class="fig-num">≈2 s</span><a class="fig-txt" href="#support-agent">warm response time of the live support-ticket agent</a></li>
+        <li><span class="fig-num">100k</span><a class="fig-txt" href="#crawler">repositories the stars crawler is designed to index</a></li>
       </ul>
     </div>
     <div class="reveal">
-      <table class="booktabs status" aria-describedby="status-cap">
-        <caption id="status-cap"><strong>Table 1.</strong> Systems in production, checked from your browser just now.</caption>
-        <thead><tr><th scope="col">System</th><th scope="col">Status</th><th scope="col" class="num">Round trip</th></tr></thead>
+      <h2 class="h-label">Live systems</h2>
+      <table class="booktabs status">
+        <caption>Deployed projects, checked from your browser just now.</caption>
+        <thead><tr><th scope="col">System</th><th scope="col">Status</th><th scope="col" class="num">Response</th></tr></thead>
         <tbody id="status-rows">
           <tr data-url="https://voice-patient-registration-seven.vercel.app/healthz"><td><a href="#voice-agent">Voice registration API</a></td><td class="st">Not checked yet</td><td class="num ms">—</td></tr>
           <tr data-url="https://support-ticket-agent.vercel.app/healthz"><td><a href="#support-agent">Support-ticket agent</a></td><td class="st">Not checked yet</td><td class="num ms">—</td></tr>
           <tr data-url="https://student-enrollment-system-lime.vercel.app/healthz"><td><a href="#enrollment">Enrollment system</a></td><td class="st">Not checked yet</td><td class="num ms">—</td></tr>
         </tbody>
       </table>
-      <p class="table-note">Free-tier servers sleep when idle, so the first check can take several seconds while they wake. <button class="linkish" id="recheck" type="button">Check again</button></p>
+      <p class="table-note">Free-tier servers sleep when idle, so the first check can take a few seconds while they wake. <button class="linkish" id="recheck" type="button">Check again</button></p>
     </div>
   </div>
 </section>
 
 <!-- ============================ WORK ============================ -->
-<section class="section work-head" id="work" data-shape="sphere" data-side="center" data-dim="0.5" data-toc="§1 Work">
-  <div class="wrap">
-    <h2 class="h-sec reveal"><span class="sec-no">§1</span> Selected work</h2>
-    <p class="sec-intro reveal">Seven projects, each written up like a short paper: what it does, how it works, what it achieved and where to see it. The figure behind the text redraws itself for every one.</p>
+<section class="section work-head" id="work" data-shape="sphere" data-toc="Work">
+  <div class="wrap split">
+    <div class="split-text">
+      <p class="kicker reveal">Selected work</p>
+      <h2 class="h-sec reveal">Seven projects</h2>
+      <p class="sec-intro reveal">Each one is written up briefly: what it does, how it works, what it achieved and where to see it. The 3D figure beside each project redraws itself to match.</p>
+    </div>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </section>
 
-<!-- 1.1 Voice agent -->
-<article class="paper" id="voice-agent" data-shape="wave" data-side="right" data-toc="1.1 Voice agent">
+<!-- 01 Voice agent -->
+<article class="paper" id="voice-agent" data-shape="wave" data-toc="01 Voice agent">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.1</p>
+      <p class="paper-no">01</p>
       <h3 class="paper-title">Voice AI Patient Registration Agent</h3>
       <p class="paper-sub">A phone agent that registers patients through natural conversation.</p>
-      <h4 class="h-label">Abstract</h4>
+      <h4 class="h-label">Overview</h4>
       <p>Callers dial a real U.S. number and talk to Riley, an intake coordinator built on Vapi. Riley collects the standard patient demographics in any order, spells names back, rejects impossible answers such as a birth date in the future, reads everything back for confirmation and only then writes the record. Returning callers are recognised by phone number and must confirm their date of birth before anything is changed.</p>
-      <h4 class="h-label">Contributions</h4>
+      <h4 class="h-label">Highlights</h4>
       <ul class="contrib">
         <li>Tool-calling agent with five backend tools: patient lookup, registration, update, appointment slots and booking.</li>
         <li>One validation layer shared by the voice tools and the REST API, so the phone channel can never store what the API would reject.</li>
@@ -148,7 +151,7 @@
         <li>Transcript, summary and cost stored for every call and shown on a live dashboard.</li>
       </ul>
       <table class="booktabs results">
-        <caption><strong>Table 2.</strong> Results and configuration.</caption>
+        <caption>Results and configuration</caption>
         <tbody>
           <tr><th scope="row">Automated tests</th><td>101</td></tr>
           <tr><th scope="row">Speech</th><td>Deepgram Nova-3 in, Aura-2 out</td></tr>
@@ -156,24 +159,24 @@
           <tr><th scope="row">Hosting</th><td>Vercel, Neon PostgreSQL</td></tr>
         </tbody>
       </table>
-      <p class="stack"><em>Stack:</em> Python · FastAPI · Vapi · SQLAlchemy · PostgreSQL · Vercel</p>
-      <p class="avail"><em>Availability:</em> <a href="https://voice-patient-registration-seven.vercel.app/" target="_blank" rel="noopener">Live dashboard</a> · <a href="https://voice-patient-registration-seven.vercel.app/docs" target="_blank" rel="noopener">API docs</a> · <a href="https://github.com/Ramim-Siddiqui/Voice-AI-patient-registration-agent" target="_blank" rel="noopener">Source</a></p>
+      <p class="stack"><em>Built with</em> Python · FastAPI · Vapi · SQLAlchemy · PostgreSQL · Vercel</p>
+      <p class="avail"><a href="https://voice-patient-registration-seven.vercel.app/" target="_blank" rel="noopener">Live dashboard</a> · <a href="https://voice-patient-registration-seven.vercel.app/docs" target="_blank" rel="noopener">API docs</a> · <a href="https://github.com/Ramim-Siddiqui/Voice-AI-patient-registration-agent" target="_blank" rel="noopener">Source code</a></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 2.</strong> Voice. The particles become a waveform that moves the way a caller's voice does.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
-<!-- 1.2 Support agent -->
-<article class="paper flip" id="support-agent" data-shape="flow" data-side="left" data-toc="1.2 Support agent">
+<!-- 02 Support agent -->
+<article class="paper flip" id="support-agent" data-shape="flow" data-toc="02 Support agent">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.2</p>
+      <p class="paper-no">02</p>
       <h3 class="paper-title">Support Ticket Resolution Agent</h3>
       <p class="paper-sub">An agentic workflow that drafts support replies and checks its own work.</p>
-      <h4 class="h-label">Abstract</h4>
+      <h4 class="h-label">Overview</h4>
       <p>A LangGraph state machine classifies each ticket, retrieves the matching knowledge-base passages with Gemini embeddings, drafts a reply with Gemini and reviews the draft against explicit rules: greet the customer, ground every fact in the retrieved context, never promise a refund. A failed draft is refined and retried; after two rejections the ticket goes to a human with the full trace logged.</p>
       <div class="console" id="console">
-        <div class="console-head"><span class="h-label">Run it here, live</span><span class="console-hint">Calls the deployed agent</span></div>
+        <div class="console-head"><span class="h-label">Try it live</span><span class="console-hint">Runs the deployed agent</span></div>
         <div class="console-examples" role="group" aria-label="Example tickets">
           <button type="button" data-s="Charged twice this month" data-d="I see two charges for my subscription on my card this month. Can I get a refund for the duplicate?">Billing</button>
           <button type="button" data-s="Can't log in on Android" data-d="Since the last update the Android app keeps rejecting my password and logging me out.">Technical</button>
@@ -190,7 +193,7 @@
         <div class="console-out" id="console-out" aria-live="polite"></div>
       </div>
       <table class="booktabs results">
-        <caption><strong>Table 3.</strong> Design.</caption>
+        <caption>Design</caption>
         <tbody>
           <tr><th scope="row">Graph</th><td>classify → retrieve → draft → review → refine or escalate</td></tr>
           <tr><th scope="row">Retry budget</th><td>2 refinements, then human escalation</td></tr>
@@ -198,24 +201,24 @@
           <tr><th scope="row">Warm latency</th><td>about 2 seconds</td></tr>
         </tbody>
       </table>
-      <p class="stack"><em>Stack:</em> LangGraph · LangChain · Google Gemini · FastAPI · Vercel</p>
-      <p class="avail"><em>Availability:</em> <a href="https://support-ticket-agent.vercel.app/" target="_blank" rel="noopener">Full demo</a> · <a href="https://github.com/Ramim-Siddiqui/Support-Agent" target="_blank" rel="noopener">Source</a></p>
+      <p class="stack"><em>Built with</em> LangGraph · LangChain · Google Gemini · FastAPI · Vercel</p>
+      <p class="avail"><a href="https://support-ticket-agent.vercel.app/" target="_blank" rel="noopener">Full demo</a> · <a href="https://github.com/Ramim-Siddiqui/Support-Agent" target="_blank" rel="noopener">Source code</a></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 3.</strong> Agent. One cluster per graph node; light travels along the edges, and the node the agent is working in glows when you run it.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
-<!-- 1.3 GNN -->
-<article class="paper" id="gnn" data-shape="tree" data-side="right" data-toc="1.3 GNN research">
+<!-- 03 GNN -->
+<article class="paper" id="gnn" data-shape="tree" data-toc="03 GNN research">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.3</p>
+      <p class="paper-no">03</p>
       <h3 class="paper-title">Detecting Source-Code Vulnerabilities with Graph Neural Networks</h3>
       <p class="paper-sub">Final-year research: graph classification over the syntax trees of C and C++ functions.</p>
-      <h4 class="h-label">Abstract</h4>
+      <h4 class="h-label">Overview</h4>
       <p>Each function in the Devign dataset, 27,318 functions from FFmpeg and QEMU, is parsed with libclang into an abstract syntax tree, linearised into node-kind and identifier tokens, and encoded as a PyTorch Geometric graph over a 54,823-entry vocabulary. A three-layer GraphSAGE network with global mean pooling then labels the function as vulnerable or not.</p>
       <table class="booktabs results">
-        <caption><strong>Table 4.</strong> Results on 3,318 held-out functions.</caption>
+        <caption>Results on 3,318 held-out functions</caption>
         <thead><tr><th scope="col">Metric</th><th scope="col" class="num">Value</th></tr></thead>
         <tbody>
           <tr><th scope="row">Test accuracy</th><td class="num">93.0%</td></tr>
@@ -225,74 +228,74 @@
           <tr><th scope="row">Parameters</th><td class="num">≈28.2 M</td></tr>
         </tbody>
       </table>
-      <p class="stack"><em>Stack:</em> PyTorch · PyTorch Geometric · libclang · scikit-learn · pandas</p>
-      <p class="avail"><em>Availability:</em> <a href="https://github.com/Ramim-Siddiqui/FYP" target="_blank" rel="noopener">Source and notebook</a></p>
+      <p class="stack"><em>Built with</em> PyTorch · PyTorch Geometric · libclang · scikit-learn · pandas</p>
+      <p class="avail"><a href="https://github.com/Ramim-Siddiqui/FYP" target="_blank" rel="noopener">Source code and notebook</a></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 4.</strong> Graph. An abstract syntax tree; the path in red is where the vulnerability hides.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
-<!-- 1.4 Smart Form Filler -->
-<article class="paper flip" id="form-filler" data-shape="grid" data-side="left" data-toc="1.4 Form filler">
+<!-- 04 Smart Form Filler -->
+<article class="paper flip" id="form-filler" data-shape="grid" data-toc="04 Form filler">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.4</p>
+      <p class="paper-no">04</p>
       <h3 class="paper-title">Smart Form Filler</h3>
       <p class="paper-sub">Record one data-entry session, then replay it for every row of a spreadsheet.</p>
-      <h4 class="h-label">Abstract</h4>
+      <h4 class="h-label">Overview</h4>
       <p>Built for web portals that have no import feature and no API. The user signs in by hand, records a single entry and maps each typed value to an Excel column; the tool then drives a real Chrome window through every remaining row, verifies each submission and writes a status for every row. Interrupted runs resume where they stopped.</p>
-      <h4 class="h-label">Contributions</h4>
+      <h4 class="h-label">Highlights</h4>
       <ul class="contrib">
         <li>A recorder injected into the page captures clicks, typed values, dropdowns and dates with stable selectors. Password fields are detected and never stored.</li>
         <li>Automatic column matching, date reformatting and a per-row success check.</li>
         <li>Up to nine copies run side by side, each with its own browser profile, login and ports.</li>
       </ul>
       <table class="booktabs results">
-        <caption><strong>Table 5.</strong> Design.</caption>
+        <caption>Design</caption>
         <tbody>
           <tr><th scope="row">Browser control</th><td>Playwright over the Chrome DevTools Protocol</td></tr>
           <tr><th scope="row">Interface</th><td>Streamlit, six guided steps</td></tr>
           <tr><th scope="row">Parallel copies</th><td>up to 9</td></tr>
         </tbody>
       </table>
-      <p class="stack"><em>Stack:</em> Python · Playwright · Streamlit · pandas</p>
-      <p class="avail"><em>Availability:</em> <a href="https://github.com/Ramim-Siddiqui/smart-form-filler" target="_blank" rel="noopener">Source</a> (a desktop tool; it drives a browser on your own machine)</p>
+      <p class="stack"><em>Built with</em> Python · Playwright · Streamlit · pandas</p>
+      <p class="avail"><a href="https://github.com/Ramim-Siddiqui/smart-form-filler" target="_blank" rel="noopener">Source code</a> <span class="muted">(a desktop tool; it drives a browser on your own machine)</span></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 5.</strong> Automation. A spreadsheet in perspective; the highlighted row is the one being typed in.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
-<!-- 1.5 Crawler -->
-<article class="paper" id="crawler" data-shape="galaxy" data-side="right" data-toc="1.5 Stars crawler">
+<!-- 05 Crawler -->
+<article class="paper" id="crawler" data-shape="galaxy" data-toc="05 Stars crawler">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.5</p>
+      <p class="paper-no">05</p>
       <h3 class="paper-title">GitHub Stars Crawler</h3>
       <p class="paper-sub">Collecting star counts for up to 100,000 repositories in a CI pipeline.</p>
-      <h4 class="h-label">Abstract</h4>
+      <h4 class="h-label">Overview</h4>
       <p>A Python crawler that runs inside GitHub Actions next to a PostgreSQL service container. It queries the GitHub GraphQL API in date slices to get past the 1,000-result search cap, upserts every repository's star count, records its progress so a run can resume, and exports a CSV and a database dump as build artifacts.</p>
-      <h4 class="h-label">Contributions</h4>
+      <h4 class="h-label">Highlights</h4>
       <ul class="contrib">
         <li>Date-sliced GraphQL search with cursor pagination.</li>
         <li>Rate-limit aware: waits for the quota to reset and retries server errors with exponential backoff.</li>
-        <li>Idempotent <span class="code">ON CONFLICT</span> upserts and a state table for resumable runs.</li>
+        <li>Idempotent upserts and a state table, so interrupted runs resume where they stopped.</li>
       </ul>
-      <p class="stack"><em>Stack:</em> Python · GraphQL · PostgreSQL · GitHub Actions</p>
-      <p class="avail"><em>Availability:</em> <a href="https://github.com/Ramim-Siddiqui/github-stars-crawler" target="_blank" rel="noopener">Source and workflow</a></p>
+      <p class="stack"><em>Built with</em> Python · GraphQL · PostgreSQL · GitHub Actions</p>
+      <p class="avail"><a href="https://github.com/Ramim-Siddiqui/github-stars-crawler" target="_blank" rel="noopener">Source code and workflow</a></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 6.</strong> Stars. A spiral galaxy, because the crawler counts stars.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
-<!-- 1.6 Lab -->
-<article class="paper flip" id="lab" data-shape="cluster" data-side="left" data-toc="1.6 ML lab">
+<!-- 06 Lab -->
+<article class="paper flip" id="lab" data-shape="cluster" data-toc="06 ML lab">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.6</p>
-      <h3 class="paper-title">Machine Learning Laboratory</h3>
+      <p class="paper-no">06</p>
+      <h3 class="paper-title">Machine Learning Lab</h3>
       <p class="paper-sub">Six experiments across audio, text, forecasting and generative AI.</p>
       <table class="booktabs lab">
-        <caption><strong>Table 6.</strong> Experiments and reported results.</caption>
+        <caption>Experiments and reported results</caption>
         <thead><tr><th scope="col">Experiment</th><th scope="col">Method</th><th scope="col">Result</th></tr></thead>
         <tbody>
           <tr><th scope="row">Real or AI-generated voice</th><td>CNN on mel-spectrograms</td><td>96.5% validation accuracy, recall 1.00</td></tr>
@@ -303,42 +306,43 @@
           <tr><th scope="row">Image and text tools</th><td>Text-to-image, U2-Net background removal, T5 paraphrasing</td><td>Toolkit</td></tr>
         </tbody>
       </table>
-      <p class="stack"><em>Stack:</em> TensorFlow · Keras · scikit-learn · XGBoost · statsmodels · LangChain · Hugging Face</p>
-      <p class="avail"><em>Availability:</em> <a href="https://github.com/Ramim-Siddiqui/ML-DL-AI-hub" target="_blank" rel="noopener">Notebooks</a></p>
+      <p class="stack"><em>Built with</em> TensorFlow · Keras · scikit-learn · XGBoost · statsmodels · LangChain · Hugging Face</p>
+      <p class="avail"><a href="https://github.com/Ramim-Siddiqui/ML-DL-AI-hub" target="_blank" rel="noopener">Notebooks</a></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 7.</strong> Laboratory. Six bodies of work, orbiting one another.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
-<!-- 1.7 Enrollment -->
-<article class="paper" id="enrollment" data-shape="cylinder" data-side="right" data-toc="1.7 Enrollment">
+<!-- 07 Enrollment -->
+<article class="paper" id="enrollment" data-shape="cylinder" data-toc="07 Enrollment">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">1.7</p>
+      <p class="paper-no">07</p>
       <h3 class="paper-title">Student Enrollment &amp; Course Management</h3>
       <p class="paper-sub">A server-rendered records system on MongoDB Atlas.</p>
-      <h4 class="h-label">Abstract</h4>
+      <h4 class="h-label">Overview</h4>
       <p>Express and EJS on top of MongoDB through Mongoose: students, courses and enrolments with full create, read, update and delete, a consolidated records view, and central error handling so malformed requests return a clean "not found" instead of crashing the server.</p>
       <table class="booktabs results">
-        <caption><strong>Table 7.</strong> Design.</caption>
+        <caption>Design</caption>
         <tbody>
           <tr><th scope="row">Routes</th><td>14, server-rendered</td></tr>
           <tr><th scope="row">Data</th><td>MongoDB Atlas through Mongoose</td></tr>
           <tr><th scope="row">Hosting</th><td>Vercel</td></tr>
         </tbody>
       </table>
-      <p class="stack"><em>Stack:</em> Node.js · Express · EJS · MongoDB · Vercel</p>
-      <p class="avail"><em>Availability:</em> <a href="https://student-enrollment-system-lime.vercel.app/" target="_blank" rel="noopener">Live demo</a> · <a href="https://github.com/Ramim-Siddiqui/Student-Enrollment-Course-Management-System" target="_blank" rel="noopener">Source</a></p>
+      <p class="stack"><em>Built with</em> Node.js · Express · EJS · MongoDB · Vercel</p>
+      <p class="avail"><a href="https://student-enrollment-system-lime.vercel.app/" target="_blank" rel="noopener">Live demo</a> · <a href="https://github.com/Ramim-Siddiqui/Student-Enrollment-Course-Management-System" target="_blank" rel="noopener">Source code</a></p>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 8.</strong> Records. The classic shape of a database, drawn in points.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </article>
 
 <!-- ============================ EXPERIENCE ============================ -->
-<section class="section experience" id="experience" data-shape="helix" data-side="right" data-toc="§2 Experience">
+<section class="section experience" id="experience" data-shape="helix" data-toc="Experience">
   <div class="wrap paper-grid">
     <div class="paper-text">
-      <h2 class="h-sec reveal"><span class="sec-no">§2</span> Experience</h2>
+      <p class="kicker reveal">Experience</p>
+      <h2 class="h-sec reveal">Where I have worked</h2>
       <ol class="roles">
         <li class="role reveal">
           <p class="role-when">July 2026 – present</p>
@@ -377,104 +381,106 @@
         </li>
       </ol>
     </div>
-    <p class="figcap paper-cap reveal"><strong>Fig. 9.</strong> Time. A double helix rising from 2024; the bright nodes are the four appointments.</p>
+    <div class="fig-slot" aria-hidden="true"></div>
   </div>
 </section>
 
-<!-- ============================ INDEX ============================ -->
-<section class="section index" id="index" data-shape="knot" data-side="center" data-dim="0.32" data-toc="§3 Index">
+<!-- ============================ SKILLS ============================ -->
+<section class="section skills" id="skills" data-shape="none" data-toc="Skills">
   <div class="wrap">
-    <h2 class="h-sec reveal"><span class="sec-no">§3</span> Index of methods</h2>
-    <p class="sec-intro reveal">Every skill, with references to where it was used. Numbers point to the papers in §1; §2 means professional experience.</p>
+    <p class="kicker reveal">Skills</p>
+    <h2 class="h-sec reveal">What I work with</h2>
+    <p class="sec-intro reveal">Every skill links to where it was used. Numbers refer to the projects above; <em>Exp.</em> means professional experience.</p>
     <div class="index-cols">
       <div class="index-group reveal">
         <h3 class="index-head">Agents &amp; language models</h3>
         <ul>
-          <li><span>LangGraph</span><i></i><span class="refs"><a href="#support-agent">1.2</a></span></li>
-          <li><span>LangChain</span><i></i><span class="refs"><a href="#support-agent">1.2</a>, <a href="#lab">1.6</a></span></li>
-          <li><span>Retrieval-augmented generation</span><i></i><span class="refs"><a href="#support-agent">1.2</a></span></li>
-          <li><span>Function and tool calling</span><i></i><span class="refs"><a href="#voice-agent">1.1</a></span></li>
-          <li><span>Voice agents, Vapi</span><i></i><span class="refs"><a href="#voice-agent">1.1</a></span></li>
-          <li><span>Google Gemini</span><i></i><span class="refs"><a href="#support-agent">1.2</a>, <a href="#lab">1.6</a></span></li>
-          <li><span>OpenAI GPT models</span><i></i><span class="refs"><a href="#voice-agent">1.1</a></span></li>
-          <li><span>Generative AI, document intelligence</span><i></i><span class="refs"><a href="#lab">1.6</a>, <a href="#experience">§2</a></span></li>
+          <li><span>LangGraph</span><i></i><span class="refs"><a href="#support-agent">02</a></span></li>
+          <li><span>LangChain</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#lab">06</a></span></li>
+          <li><span>Retrieval-augmented generation</span><i></i><span class="refs"><a href="#support-agent">02</a></span></li>
+          <li><span>Function and tool calling</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
+          <li><span>Voice agents, Vapi</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
+          <li><span>Google Gemini</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#lab">06</a></span></li>
+          <li><span>OpenAI GPT models</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
+          <li><span>Generative AI</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Document intelligence</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Machine &amp; deep learning</h3>
         <ul>
-          <li><span>Graph neural networks</span><i></i><span class="refs"><a href="#gnn">1.3</a></span></li>
-          <li><span>PyTorch, PyTorch Geometric</span><i></i><span class="refs"><a href="#gnn">1.3</a></span></li>
-          <li><span>TensorFlow, Keras</span><i></i><span class="refs"><a href="#lab">1.6</a></span></li>
-          <li><span>CNN, RNN, LSTM</span><i></i><span class="refs"><a href="#lab">1.6</a></span></li>
-          <li><span>Transformers, transfer learning</span><i></i><span class="refs"><a href="#lab">1.6</a>, <a href="#experience">§2</a></span></li>
-          <li><span>scikit-learn, XGBoost</span><i></i><span class="refs"><a href="#gnn">1.3</a>, <a href="#lab">1.6</a></span></li>
-          <li><span>NLP, computer vision</span><i></i><span class="refs"><a href="#lab">1.6</a>, <a href="#experience">§2</a></span></li>
-          <li><span>Recommendation systems</span><i></i><span class="refs"><a href="#lab">1.6</a>, <a href="#experience">§2</a></span></li>
+          <li><span>Graph neural networks</span><i></i><span class="refs"><a href="#gnn">03</a></span></li>
+          <li><span>PyTorch, PyTorch Geometric</span><i></i><span class="refs"><a href="#gnn">03</a></span></li>
+          <li><span>TensorFlow, Keras</span><i></i><span class="refs"><a href="#lab">06</a></span></li>
+          <li><span>CNN, RNN, LSTM</span><i></i><span class="refs"><a href="#lab">06</a></span></li>
+          <li><span>Transformers, transfer learning</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>scikit-learn, XGBoost</span><i></i><span class="refs"><a href="#gnn">03</a>, <a href="#lab">06</a></span></li>
+          <li><span>NLP, computer vision</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Recommendation systems</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Backend &amp; automation</h3>
         <ul>
-          <li><span>FastAPI</span><i></i><span class="refs"><a href="#voice-agent">1.1</a>, <a href="#support-agent">1.2</a>, <a href="#experience">§2</a></span></li>
-          <li><span>Flask</span><i></i><span class="refs"><a href="#experience">§2</a></span></li>
-          <li><span>REST API design</span><i></i><span class="refs"><a href="#voice-agent">1.1</a>, <a href="#experience">§2</a></span></li>
-          <li><span>Node.js, Express</span><i></i><span class="refs"><a href="#enrollment">1.7</a>, <a href="#experience">§2</a></span></li>
-          <li><span>Playwright browser automation</span><i></i><span class="refs"><a href="#form-filler">1.4</a></span></li>
-          <li><span>Streamlit</span><i></i><span class="refs"><a href="#form-filler">1.4</a></span></li>
-          <li><span>Laravel integration</span><i></i><span class="refs"><a href="#experience">§2</a></span></li>
+          <li><span>FastAPI</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#support-agent">02</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Flask</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>REST API design</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Node.js, Express</span><i></i><span class="refs"><a href="#enrollment">07</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Playwright browser automation</span><i></i><span class="refs"><a href="#form-filler">04</a></span></li>
+          <li><span>Streamlit</span><i></i><span class="refs"><a href="#form-filler">04</a></span></li>
+          <li><span>Laravel integration</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Data</h3>
         <ul>
-          <li><span>PostgreSQL</span><i></i><span class="refs"><a href="#voice-agent">1.1</a>, <a href="#crawler">1.5</a></span></li>
-          <li><span>MongoDB</span><i></i><span class="refs"><a href="#enrollment">1.7</a></span></li>
-          <li><span>SQL optimisation</span><i></i><span class="refs"><a href="#crawler">1.5</a>, <a href="#experience">§2</a></span></li>
-          <li><span>ETL pipelines, Boomi</span><i></i><span class="refs"><a href="#experience">§2</a></span></li>
-          <li><span>GraphQL APIs</span><i></i><span class="refs"><a href="#crawler">1.5</a></span></li>
-          <li><span>pandas, NumPy, SciPy</span><i></i><span class="refs"><a href="#form-filler">1.4</a>, <a href="#lab">1.6</a></span></li>
-          <li><span>Feature engineering</span><i></i><span class="refs"><a href="#lab">1.6</a>, <a href="#experience">§2</a></span></li>
+          <li><span>PostgreSQL</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#crawler">05</a></span></li>
+          <li><span>MongoDB</span><i></i><span class="refs"><a href="#enrollment">07</a></span></li>
+          <li><span>SQL optimisation</span><i></i><span class="refs"><a href="#crawler">05</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>ETL pipelines, Boomi</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>GraphQL APIs</span><i></i><span class="refs"><a href="#crawler">05</a></span></li>
+          <li><span>pandas, NumPy, SciPy</span><i></i><span class="refs"><a href="#form-filler">04</a>, <a href="#lab">06</a></span></li>
+          <li><span>Feature engineering</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">MLOps &amp; cloud</h3>
         <ul>
-          <li><span>Docker, Linux servers</span><i></i><span class="refs"><a href="#experience">§2</a></span></li>
-          <li><span>Kubernetes, MLflow</span><i></i><span class="refs"><a href="#experience">§2</a></span></li>
-          <li><span>GitHub Actions</span><i></i><span class="refs"><a href="#crawler">1.5</a></span></li>
-          <li><span>Vercel</span><i></i><span class="refs"><a href="#voice-agent">1.1</a>, <a href="#support-agent">1.2</a>, <a href="#enrollment">1.7</a></span></li>
-          <li><span>AWS, Google Cloud</span><i></i><span class="refs"><a href="#experience">§2</a></span></li>
-          <li><span>Automated testing</span><i></i><span class="refs"><a href="#voice-agent">1.1</a></span></li>
+          <li><span>Docker, Linux servers</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>Kubernetes, MLflow</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>GitHub Actions</span><i></i><span class="refs"><a href="#crawler">05</a></span></li>
+          <li><span>Vercel</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#support-agent">02</a>, <a href="#enrollment">07</a></span></li>
+          <li><span>AWS, Google Cloud</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>Automated testing</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Languages</h3>
         <ul>
-          <li><span>Python</span><i></i><span class="refs"><a href="#voice-agent">1.1–1.6</a></span></li>
-          <li><span>SQL</span><i></i><span class="refs"><a href="#crawler">1.5</a>, <a href="#experience">§2</a></span></li>
-          <li><span>JavaScript</span><i></i><span class="refs"><a href="#enrollment">1.7</a></span></li>
+          <li><span>Python</span><i></i><span class="refs"><a href="#voice-agent">01–06</a></span></li>
+          <li><span>SQL</span><i></i><span class="refs"><a href="#crawler">05</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>JavaScript</span><i></i><span class="refs"><a href="#enrollment">07</a></span></li>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============================ AUTHOR ============================ -->
-<section class="section author" id="author" data-shape="dust" data-side="center" data-dim="0.4" data-toc="§4 Author">
+<!-- ============================ ABOUT ============================ -->
+<section class="section about" id="about" data-shape="none" data-toc="About">
   <div class="wrap">
-    <h2 class="h-sec reveal"><span class="sec-no">§4</span> About the author</h2>
+    <p class="kicker reveal">About</p>
+    <h2 class="h-sec reveal">A little about me</h2>
     <div class="author-grid">
       <figure class="plate reveal">
         <picture>
           <source srcset="assets/portrait.webp" type="image/webp">
           <img src="assets/portrait.jpg" width="720" height="720" alt="Portrait of Ramim Ali Siddiqui" loading="lazy" decoding="async">
         </picture>
-        <figcaption><strong>Plate I.</strong> The author, Karachi.</figcaption>
       </figure>
       <div class="bio reveal">
-        <p class="dropcap">Ramim Ali Siddiqui is an AI/ML engineer based in Karachi. He holds a B.S. in Computer Science from Sukkur IBA University, where his final-year research applied graph neural networks to source-code security. Since then he has worked across freelance data science, enterprise data engineering at Squarera and, currently, applied AI engineering at Gems Pathways.</p>
-        <p>He is most interested in systems that pair language models with careful engineering: agents that can be trusted to act, and pipelines that keep working when nobody is watching.</p>
+        <p class="dropcap">I am an AI/ML engineer based in Karachi. I hold a B.S. in Computer Science from Sukkur IBA University, where my final-year research applied graph neural networks to source-code security. Since then I have worked across freelance data science, enterprise data engineering at Squarera and, currently, applied AI engineering at Gems Pathways.</p>
+        <p>I am most interested in systems that pair language models with careful engineering: agents that can be trusted to act, and pipelines that keep working when nobody is watching.</p>
         <div class="bio-cols">
           <div>
             <h3 class="h-label">Education</h3>
@@ -484,7 +490,7 @@
             </dl>
           </div>
           <div>
-            <h3 class="h-label">Honours</h3>
+            <h3 class="h-label">Achievements</h3>
             <ul class="honours">
               <li>Winner, Robo War Competition, SIBA Test, Sukkur IBA University (2025)</li>
               <li>Second place, Cyber Security Hackathon Workshop, Ignite</li>
@@ -498,18 +504,18 @@
 </section>
 
 <!-- ============================ CONTACT ============================ -->
-<section class="section contact" id="contact" data-shape="text" data-side="center" data-toc="§5 Contact">
+<section class="section contact" id="contact" data-shape="text" data-toc="Contact">
   <div class="wrap">
-    <h2 class="h-sec reveal"><span class="sec-no">§5</span> Correspondence</h2>
-    <div class="contact-space" aria-hidden="true"></div>
+    <p class="kicker reveal">Contact</p>
+    <div class="fig-slot contact-slot" aria-hidden="true"></div>
+    <h2 class="sr">Say hello</h2>
     <p class="contact-lede reveal">For engineering roles, collaborations, or a conversation about agents, voice AI or graph learning, write to me.</p>
     <p class="contact-mail reveal"><a href="mailto:ramimalisiddiqui0@gmail.com">ramimalisiddiqui0@gmail.com</a></p>
     <ul class="contact-links reveal">
       <li><a href="https://www.linkedin.com/in/ramim-siddiqui" target="_blank" rel="noopener">LinkedIn</a></li>
       <li><a href="https://github.com/Ramim-Siddiqui" target="_blank" rel="noopener">GitHub</a></li>
-      <li><a href="assets/Ramim_Ali_Siddiqui_CV.pdf" download>Curriculum vitae (PDF)</a></li>
+      <li><a href="assets/Ramim_Ali_Siddiqui_CV.pdf" download>CV (PDF)</a></li>
     </ul>
-    <p class="figcap figcap-contact reveal"><strong>Fig. 10.</strong> Thousands of particles, one sentence.</p>
   </div>
 </section>
 </main>
@@ -517,7 +523,7 @@
 <footer class="footer">
   <div class="wrap footer-in">
     <p>© <span id="year">2026</span> Ramim Ali Siddiqui. All rights reserved.</p>
-    <p class="muted">Set in Times New Roman. Figures drawn live in WebGL.</p>
+    <p class="muted">Built with Three.js. Set in Times New Roman.</p>
     <p><a href="#top">Back to top ↑</a></p>
   </div>
 </footer>

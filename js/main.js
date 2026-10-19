@@ -1,4 +1,4 @@
-// Page behaviour: edition toggle, navigation, reading progress, table of contents,
+// Page behaviour: light/dark mode, navigation, reading progress, side rail,
 // reveal-on-scroll, live system status and the inline support-agent console.
 
 const root = document.documentElement;
@@ -6,59 +6,57 @@ const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ---------- Edition (light / dark) ---------- */
-const editionBtn = $("#edition");
-const editionLabel = $("#edition-label");
-function paintEditionLabel() {
-  editionLabel.textContent = root.dataset.theme === "dark" ? "Day edition" : "Night edition";
+/* ---------- Light / dark mode ---------- */
+const modeBtn = $("#edition");
+const modeLabel = $("#edition-label");
+function paintModeLabel() {
+  modeLabel.textContent = root.dataset.theme === "dark" ? "Light mode" : "Dark mode";
 }
-paintEditionLabel();
-editionBtn.addEventListener("click", () => {
+paintModeLabel();
+modeBtn.addEventListener("click", () => {
   const next = root.dataset.theme === "dark" ? "light" : "dark";
   root.dataset.theme = next;
   try { localStorage.setItem("edition", next); } catch (e) { /* ignore */ }
-  paintEditionLabel();
+  paintModeLabel();
   window.dispatchEvent(new CustomEvent("editionchange", { detail: next }));
 });
 
 /* ---------- Mobile menu ---------- */
 const menuBtn = $("#menu");
 const navLinks = $("#nav-links");
+function closeMenu() {
+  navLinks.classList.remove("open");
+  menuBtn.setAttribute("aria-expanded", "false");
+  menuBtn.textContent = "Menu";
+}
 menuBtn.addEventListener("click", () => {
   const open = navLinks.classList.toggle("open");
   menuBtn.setAttribute("aria-expanded", String(open));
   menuBtn.textContent = open ? "Close" : "Menu";
 });
-navLinks.addEventListener("click", (e) => {
-  if (e.target.closest("a")) {
-    navLinks.classList.remove("open");
-    menuBtn.setAttribute("aria-expanded", "false");
-    menuBtn.textContent = "Menu";
-  }
-});
+navLinks.addEventListener("click", (e) => { if (e.target.closest("a")) closeMenu(); });
 
-/* ---------- Table of contents (built from data-toc) ---------- */
-const tocTargets = $$("[data-toc]");
-const toc = $("#toc");
-const tocList = document.createElement("ol");
-tocTargets.forEach((el) => {
-  const [no, ...rest] = el.dataset.toc.split(" ");
+/* ---------- Side rail (built from data-toc) ---------- */
+const railTargets = $$("[data-toc]");
+const rail = $("#toc");
+const railList = document.createElement("ol");
+railTargets.forEach((el) => {
   const li = document.createElement("li");
   const a = document.createElement("a");
   a.href = `#${el.id}`;
-  const n = document.createElement("span");
-  n.className = "t-no";
-  n.textContent = /^[§¶\d]/.test(no) ? no : "";
+  const tick = document.createElement("span");
+  tick.className = "tick";
   const label = document.createElement("span");
   label.className = "t-label";
-  label.textContent = /^[§¶\d]/.test(no) ? rest.join(" ") : el.dataset.toc;
-  a.append(n, label);
+  label.textContent = el.dataset.toc;
+  a.append(tick, label);
   li.append(a);
-  tocList.append(li);
+  railList.append(li);
 });
-toc.append(tocList);
-const tocLinks = $$("a", toc);
+rail.append(railList);
+const railLinks = $$("a", rail);
 const navAnchors = $$(".nav-links a");
+const NAV_FOR = { "work": "work", "voice-agent": "work", "support-agent": "work", "gnn": "work", "form-filler": "work", "crawler": "work", "lab": "work", "enrollment": "work", "experience": "experience", "skills": "skills", "about": "about", "contact": "contact" };
 
 /* ---------- Scroll: progress, nav state, active section ---------- */
 const progress = $("#progress");
@@ -71,12 +69,12 @@ function onScroll() {
 
   const mid = innerHeight * 0.45;
   let current = null;
-  for (const el of tocTargets) {
+  for (const el of railTargets) {
     const r = el.getBoundingClientRect();
     if (r.top <= mid && r.bottom > mid) current = el.id;
   }
-  tocLinks.forEach((a) => a.classList.toggle("active", a.hash === `#${current}`));
-  const top = current && (current.startsWith("voice") || ["support-agent", "gnn", "form-filler", "crawler", "lab", "enrollment", "work"].includes(current)) ? "work" : current;
+  railLinks.forEach((a) => a.classList.toggle("active", a.hash === `#${current}`));
+  const top = NAV_FOR[current] || null;
   navAnchors.forEach((a) => a.classList.toggle("active", a.hash === `#${top}`));
   ticking = false;
 }
@@ -94,7 +92,7 @@ if ("IntersectionObserver" in window && !reducedMotion) {
   $$(".reveal").forEach((el) => el.classList.add("in"));
 }
 
-/* ---------- Live system status (Table 1) ---------- */
+/* ---------- Live system status ---------- */
 const rows = $$("#status-rows tr");
 async function ping(url) {
   const started = performance.now();
@@ -119,10 +117,10 @@ function setStatus(row, cls, text, ms) {
 async function checkAll() {
   await Promise.all(rows.map(async (row) => {
     setStatus(row, "wait", "Checking", "…");
-    const slow = setTimeout(() => setStatus(row, "wait", "Waking from sleep", "…"), 2500);
+    const slow = setTimeout(() => setStatus(row, "wait", "Waking up", "…"), 2500);
     const res = await ping(row.dataset.url);
     clearTimeout(slow);
-    if (res.ok) setStatus(row, "ok", res.ms > 4000 ? "Operational (was asleep)" : "Operational", `${res.ms.toLocaleString()} ms`);
+    if (res.ok) setStatus(row, "ok", res.ms > 4000 ? "Online (was asleep)" : "Online", `${res.ms.toLocaleString()} ms`);
     else setStatus(row, "bad", "Unreachable", "—");
   }));
 }
@@ -157,12 +155,12 @@ $$(".console-examples button").forEach((b) => b.addEventListener("click", () => 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (subject.value.trim().length < 3 || desc.value.trim().length < 10) {
-    out.innerHTML = '<p class="thinking-none">Please give a subject (3+ characters) and a description (10+ characters).</p>';
+    out.innerHTML = "<p>Please give a subject (3+ characters) and a description (10+ characters).</p>";
     return;
   }
   runBtn.disabled = true;
   out.innerHTML = '<p class="thinking">The agent is classifying, retrieving, drafting and reviewing</p>';
-  // While we wait, walk the figure through the first four nodes.
+  // While waiting, walk the figure through the first four graph nodes.
   let k = 0;
   const walker = setInterval(() => step(k++ % 4), 700);
   try {
@@ -193,7 +191,7 @@ form.addEventListener("submit", async (e) => {
     const resolved = data.outcome === "resolved";
     const verdict = document.createElement("p");
     verdict.className = "verdict";
-    verdict.innerHTML = `<span class="tag ${resolved ? "ok" : "warn"}">${resolved ? "Resolved" : "Escalated"}</span><span class="muted">category ${esc(data.category)} · ${esc(data.seconds)} s on the server</span>`;
+    verdict.innerHTML = `<span class="tag ${resolved ? "ok" : "warn"}">${resolved ? "Resolved" : "Escalated"}</span><span class="muted">category ${esc(data.category)}, ${esc(data.seconds)} s on the server</span>`;
     out.append(verdict);
     if (resolved && data.reply) {
       const reply = document.createElement("blockquote");
