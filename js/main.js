@@ -56,7 +56,7 @@ railTargets.forEach((el) => {
 rail.append(railList);
 const railLinks = $$("a", rail);
 const navAnchors = $$(".nav-links a");
-const NAV_FOR = { "work": "work", "voice-agent": "work", "support-agent": "work", "gnn": "work", "form-filler": "work", "crawler": "work", "lab": "work", "enrollment": "work", "experience": "experience", "skills": "skills", "about": "about", "contact": "contact" };
+const NAV_FOR = { "work": "work", "voice-agent": "work", "support-agent": "work", "mcq-studio": "work", "attendance": "work", "portraitpass": "work", "gnn": "work", "form-filler": "work", "crawler": "work", "lab": "work", "enrollment": "work", "experience": "experience", "skills": "skills", "about": "about", "contact": "contact" };
 
 /* ---------- Scroll: progress, nav state, active section ---------- */
 const progress = $("#progress");

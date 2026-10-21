@@ -6,7 +6,7 @@ Personal portfolio of Ramim Ali Siddiqui, AI/ML engineer. The site is set in Tim
 
 ## Features
 
-- **Living figure** (Three.js, custom shaders): thousands of particles morph between a neural sphere, a voice waveform, the support agent's graph, a syntax tree, a spreadsheet with a scan line, a galaxy, orbiting bodies, a database, a helix and finally the words "Say hello." The cursor disturbs the particles.
+- **Living figure** (Three.js, custom shaders): thousands of particles morph between a neural sphere, a voice waveform, the support agent's graph, an answer sheet, a camera lens tracking faces, a portrait bust with its face landmarks, a syntax tree, a spreadsheet with a scan line, a galaxy, orbiting bodies, a database, a helix and finally the words "Say hello." The cursor disturbs the particles.
 - **No overlap by design**: every section reserves an empty column for the figure. The figure is measured through the camera into that column on every frame, so it never covers text at any screen size, and it fades out in text-only sections.
 - **Live systems table**: pings the deployed projects from the visitor's browser and reports response time.
 - **Inline agent console**: runs the deployed Support Ticket Resolution Agent and lights up each graph node in the figure as the agent passes through it.

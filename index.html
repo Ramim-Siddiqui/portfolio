@@ -76,10 +76,10 @@
     <div class="split-text">
       <p class="kicker reveal">The work of</p>
       <h1 class="name reveal">Ramim Ali<br><em>Siddiqui<span class="dot">.</span></em></h1>
-      <p class="dek reveal">AI/ML engineer. I build systems that listen, reason and act: voice agents, LLM workflows and graph neural networks, and the data pipelines that keep them running in production.</p>
+      <p class="dek reveal">AI/ML engineer. I build systems that listen, see, reason and act: voice agents, LLM workflows, computer vision and graph neural networks, and the data pipelines that keep them running in production.</p>
       <div class="actions reveal">
         <a class="btn btn-ink" href="#work">See the work</a>
-        <a class="btn" href="assets/Ramim_Ali_Siddiqui_CV.pdf" download>Download CV <span class="muted">(PDF)</span></a>
+        <a class="btn" href="assets/Ramim_Ali_Siddiqui_CV.pdf?v=20261021" download>Download CV <span class="muted">(PDF)</span></a>
         <a class="btn btn-quiet" href="#contact">Get in touch</a>
       </div>
       <dl class="hero-meta reveal">
@@ -97,11 +97,11 @@
   <div class="wrap grid-2">
     <div class="reveal">
       <h2 class="h-label">Summary</h2>
-      <p class="lede">An AI/ML engineer working where machine learning meets production engineering. Recent work spans tool-calling voice agents, LangGraph workflows that review their own output, graph neural networks for source-code security, browser automation and enterprise ETL. The common thread is shipping: every project below either runs live or is open to read.</p>
+      <p class="lede">An AI/ML engineer who builds LLM agents, document AI and computer vision services in Python and ships them as tested, deployed APIs. At Gems Pathways that means MCQ Studio, PortraitPass and Smart Form Filler, used with the company's learning portal; on my own, a phone agent that registers patients and a support agent that reviews its own replies, both running live. Every project below is open to read.</p>
       <h3 class="h-label h-label-sm">Key figures</h3>
       <ul class="figures">
-        <li><span class="fig-num">93.0%</span><a class="fig-txt" href="#gnn">test accuracy of the graph-neural-network vulnerability detector</a></li>
         <li><span class="fig-num">101</span><a class="fig-txt" href="#voice-agent">automated tests behind the voice registration agent</a></li>
+        <li><span class="fig-num">173</span><a class="fig-txt" href="#mcq-studio">automated tests behind MCQ Studio</a></li>
         <li><span class="fig-num">≈2 s</span><a class="fig-txt" href="#support-agent">warm response time of the live support-ticket agent</a></li>
         <li><span class="fig-num">100k</span><a class="fig-txt" href="#crawler">repositories the stars crawler is designed to index</a></li>
       </ul>
@@ -127,7 +127,7 @@
   <div class="wrap split">
     <div class="split-text">
       <p class="kicker reveal">Selected work</p>
-      <h2 class="h-sec reveal">Seven projects</h2>
+      <h2 class="h-sec reveal">Ten projects</h2>
       <p class="sec-intro reveal">Each one is written up briefly: what it does, how it works, what it achieved and where to see it. The 3D figure beside each project redraws itself to match.</p>
     </div>
     <div class="fig-slot" aria-hidden="true"></div>
@@ -208,11 +208,107 @@
   </div>
 </article>
 
-<!-- 03 GNN -->
-<article class="paper" id="gnn" data-shape="tree" data-toc="03 GNN research">
+<!-- 03 MCQ Studio -->
+<article class="paper" id="mcq-studio" data-shape="quiz" data-toc="03 MCQ Studio">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
       <p class="paper-no">03</p>
+      <h3 class="paper-title">MCQ Studio</h3>
+      <p class="paper-sub">Writes exam questions from textbooks, and pulls them out of old papers.</p>
+      <h4 class="h-label">Overview</h4>
+      <p>A FastAPI service I built at Gems Pathways for the company's learning portal. A teacher uploads a book as PDF, Word, Markdown or text; the service finds its chapters, stores the text as embedded passages in Qdrant, and writes multiple-choice questions spread across the chapters by the weightage the teacher sets. It also works the other way round, copying existing questions and their answer keys out of a question paper so an admin can review them.</p>
+      <h4 class="h-label">Highlights</h4>
+      <ul class="contrib">
+        <li>Chapter detection that tries PDF bookmarks, then a printed table of contents matched to the real pages, then headings and font sizes, and copes with books whose chapter numbers restart in every part.</li>
+        <li>Questions cover whole chapters: text is read in slices of about 12,000 characters, and embeddings pick varied slices when only a few questions are needed.</li>
+        <li>Every question is checked, near-duplicates are removed by wording and by meaning, and answer positions are balanced so A, B, C and D are each correct about equally often.</li>
+        <li>Five interchangeable AI providers: Gemini, Groq, OpenRouter, any OpenAI-compatible API or a local Ollama model. Extraction falls back to a rule-based parser when the quota runs out.</li>
+      </ul>
+      <table class="booktabs results">
+        <caption>Design</caption>
+        <tbody>
+          <tr><th scope="row">Automated tests</th><td>173, with a fake AI provider and no database needed</td></tr>
+          <tr><th scope="row">Embeddings</th><td>BAAI/bge-small-en-v1.5, stored in Qdrant</td></tr>
+          <tr><th scope="row">Inputs</th><td>PDF, Word, Markdown and plain text</td></tr>
+          <tr><th scope="row">Deployment</th><td>Docker Compose, API key, ports bound to the server only</td></tr>
+        </tbody>
+      </table>
+      <p class="stack"><em>Built with</em> Python · FastAPI · PyMuPDF · sentence-transformers · Qdrant · Gemini · Groq · Docker</p>
+      <p class="avail"><a href="https://github.com/Ramim-Siddiqui/mcq-studio" target="_blank" rel="noopener">Source code</a> <span class="muted">(a back-end service; it runs locally or in Docker)</span></p>
+    </div>
+    <div class="fig-slot" aria-hidden="true"></div>
+  </div>
+</article>
+
+<!-- 04 Smart attendance -->
+<article class="paper flip" id="attendance" data-shape="lens" data-toc="04 Attendance">
+  <div class="wrap paper-grid">
+    <div class="paper-text reveal">
+      <p class="paper-no">04</p>
+      <h3 class="paper-title">Smart Attendance System</h3>
+      <p class="paper-sub">Face-recognition attendance from an ordinary CCTV camera.</p>
+      <h4 class="h-label">Overview</h4>
+      <p>A Windows desktop app that watches a CCTV camera or recorder, recognises the people enrolled from a few photos, numbers everyone else Unknown-1, Unknown-2 and so on, and logs when each person comes in and leaves. It runs on a normal PC with no GPU and no internet connection.</p>
+      <h4 class="h-label">Highlights</h4>
+      <ul class="contrib">
+        <li>SCRFD finds faces and ArcFace turns each one into a 512-number embedding, both on ONNX Runtime. A face is named when it is close enough to an enrolled person.</li>
+        <li>A tracker logs one visit per person: a face must appear in three frames before IN is written, two frames must agree on a name, and OUT is the last moment the person was seen.</li>
+        <li>Enrolment adds CCTV-like variations of every photo: dark, bright, blurred, distant, compressed, night-mode grey and noisy.</li>
+        <li>Finds cameras on the network, builds stream addresses for six recorder brands, reconnects after drops, and stores the camera password encrypted for the Windows user.</li>
+      </ul>
+      <table class="booktabs results">
+        <caption>Design</caption>
+        <tbody>
+          <tr><th scope="row">Recognition</th><td>SCRFD and ArcFace (InsightFace models)</td></tr>
+          <tr><th scope="row">Runs on</th><td>CPU, ONNX Runtime, no internet</td></tr>
+          <tr><th scope="row">Output</th><td>Daily attendance CSV and a snapshot of every visit</td></tr>
+          <tr><th scope="row">Interface</th><td>Tkinter, four tabs</td></tr>
+        </tbody>
+      </table>
+      <p class="stack"><em>Built with</em> Python · OpenCV · ONNX Runtime · InsightFace · Tkinter</p>
+      <p class="avail"><a href="https://github.com/Ramim-Siddiqui/smart-attendance-system" target="_blank" rel="noopener">Source code</a> <span class="muted">(a desktop app; it needs a camera on the same network)</span></p>
+    </div>
+    <div class="fig-slot" aria-hidden="true"></div>
+  </div>
+</article>
+
+<!-- 05 PortraitPass -->
+<article class="paper" id="portraitpass" data-shape="bust" data-toc="05 PortraitPass">
+  <div class="wrap paper-grid">
+    <div class="paper-text reveal">
+      <p class="paper-no">05</p>
+      <h3 class="paper-title">PortraitPass</h3>
+      <p class="paper-sub">Checks student ID photos and removes the background.</p>
+      <h4 class="h-label">Overview</h4>
+      <p>An API I built at Gems Pathways, called by the student portal when a photo is uploaded. It checks the photo against a portrait policy and returns either a clean transparent cut-out or a list of machine-readable reasons, such as a second person, a head turned away or a blurred shot, that the portal turns into instructions for the student.</p>
+      <h4 class="h-label">Highlights</h4>
+      <ul class="contrib">
+        <li>MediaPipe face and pose landmarkers scan the whole photo and a grid of overlapping tiles, so a second person in the background is still caught.</li>
+        <li>Head turn, nod and tilt come from the face landmarker's transformation matrix and must each stay within 25 degrees. Visible knees or ankles mark a full-body shot.</li>
+        <li>BiRefNet Portrait segments the person at 1024 by 1024 pixels; the mask is cleaned and feathered so hair survives.</li>
+        <li>Upload checks on format, size, dimensions, animation and decompression bombs run before any model does.</li>
+      </ul>
+      <table class="booktabs results">
+        <caption>Design</caption>
+        <tbody>
+          <tr><th scope="row">Validation</th><td>MediaPipe Face and Pose Landmarker</td></tr>
+          <tr><th scope="row">Segmentation</th><td>BiRefNet Portrait</td></tr>
+          <tr><th scope="row">Output</th><td>Transparent PNG, or rejection codes with messages</td></tr>
+          <tr><th scope="row">Speed</th><td>About 40 s per photo on a CPU; the live demo runs on a GPU</td></tr>
+        </tbody>
+      </table>
+      <p class="stack"><em>Built with</em> Python · FastAPI · Gradio · MediaPipe · PyTorch · Hugging Face Transformers · OpenCV · Docker</p>
+      <p class="avail"><a href="https://huggingface.co/spaces/ramimali/student-portrait-bg-remover" target="_blank" rel="noopener">Live demo</a> · <a href="https://github.com/Ramim-Siddiqui/portraitpass" target="_blank" rel="noopener">Source code</a></p>
+    </div>
+    <div class="fig-slot" aria-hidden="true"></div>
+  </div>
+</article>
+
+<!-- 06 GNN -->
+<article class="paper flip" id="gnn" data-shape="tree" data-toc="06 GNN research">
+  <div class="wrap paper-grid">
+    <div class="paper-text reveal">
+      <p class="paper-no">06</p>
       <h3 class="paper-title">Detecting Source-Code Vulnerabilities with Graph Neural Networks</h3>
       <p class="paper-sub">Final-year research: graph classification over the syntax trees of C and C++ functions.</p>
       <h4 class="h-label">Overview</h4>
@@ -228,6 +324,7 @@
           <tr><th scope="row">Parameters</th><td class="num">≈28.2 M</td></tr>
         </tbody>
       </table>
+      <p class="table-note">The held-out functions are the last rows of the dataset, and near-duplicate functions were not removed, so these figures are an in-distribution estimate rather than a benchmark result. Published results on Devign's official split are much lower.</p>
       <p class="stack"><em>Built with</em> PyTorch · PyTorch Geometric · libclang · scikit-learn · pandas</p>
       <p class="avail"><a href="https://github.com/Ramim-Siddiqui/FYP" target="_blank" rel="noopener">Source code and notebook</a></p>
     </div>
@@ -235,15 +332,15 @@
   </div>
 </article>
 
-<!-- 04 Smart Form Filler -->
-<article class="paper flip" id="form-filler" data-shape="grid" data-toc="04 Form filler">
+<!-- 07 Smart Form Filler -->
+<article class="paper" id="form-filler" data-shape="grid" data-toc="07 Form filler">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">04</p>
+      <p class="paper-no">07</p>
       <h3 class="paper-title">Smart Form Filler</h3>
       <p class="paper-sub">Record one data-entry session, then replay it for every row of a spreadsheet.</p>
       <h4 class="h-label">Overview</h4>
-      <p>Built for web portals that have no import feature and no API. The user signs in by hand, records a single entry and maps each typed value to an Excel column; the tool then drives a real Chrome window through every remaining row, verifies each submission and writes a status for every row. Interrupted runs resume where they stopped.</p>
+      <p>Built at Gems Pathways for web portals that have no import feature and no API. The user signs in by hand, records a single entry and maps each typed value to an Excel column; the tool then drives a real Chrome window through every remaining row, verifies each submission and writes a status for every row. Interrupted runs resume where they stopped.</p>
       <h4 class="h-label">Highlights</h4>
       <ul class="contrib">
         <li>A recorder injected into the page captures clicks, typed values, dropdowns and dates with stable selectors. Password fields are detected and never stored.</li>
@@ -265,11 +362,11 @@
   </div>
 </article>
 
-<!-- 05 Crawler -->
-<article class="paper" id="crawler" data-shape="galaxy" data-toc="05 Stars crawler">
+<!-- 08 Crawler -->
+<article class="paper flip" id="crawler" data-shape="galaxy" data-toc="08 Stars crawler">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">05</p>
+      <p class="paper-no">08</p>
       <h3 class="paper-title">GitHub Stars Crawler</h3>
       <p class="paper-sub">Collecting star counts for up to 100,000 repositories in a CI pipeline.</p>
       <h4 class="h-label">Overview</h4>
@@ -287,19 +384,19 @@
   </div>
 </article>
 
-<!-- 06 Lab -->
-<article class="paper flip" id="lab" data-shape="cluster" data-toc="06 ML lab">
+<!-- 09 Lab -->
+<article class="paper" id="lab" data-shape="cluster" data-toc="09 ML lab">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">06</p>
+      <p class="paper-no">09</p>
       <h3 class="paper-title">Machine Learning Lab</h3>
       <p class="paper-sub">Six experiments across audio, text, forecasting and generative AI.</p>
       <table class="booktabs lab">
         <caption>Experiments and reported results</caption>
         <thead><tr><th scope="col">Experiment</th><th scope="col">Method</th><th scope="col">Result</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Real or AI-generated voice</th><td>CNN on mel-spectrograms</td><td>96.5% validation accuracy, recall 1.00</td></tr>
-          <tr><th scope="row">Fake-news detection</th><td>TF-IDF with Random Forest; LSTM</td><td>99.4% test accuracy (RF); 92.1% (LSTM)</td></tr>
+          <tr><th scope="row">Real or AI-generated voice</th><td>CNN on mel-spectrograms</td><td>96.5% validation accuracy on 1,000 clips</td></tr>
+          <tr><th scope="row">Fake-news detection</th><td>TF-IDF with Random Forest on author and title; LSTM on article text</td><td>99.4% (RF), helped by author names that give the label away; 92.1% (LSTM)</td></tr>
           <tr><th scope="row">Dynamic forecasting</th><td>Fifteen regression and time-series models, best chosen by R²</td><td>Works on any CSV or Excel file</td></tr>
           <tr><th scope="row">Music recommendation</th><td>Content-based: count vectors and cosine similarity</td><td>Top-ten similar songs</td></tr>
           <tr><th scope="row">Gemini through LangChain</th><td>Streaming, LCEL chains, program-aided maths, vision Q&amp;A</td><td>Walkthrough</td></tr>
@@ -313,11 +410,11 @@
   </div>
 </article>
 
-<!-- 07 Enrollment -->
-<article class="paper" id="enrollment" data-shape="cylinder" data-toc="07 Enrollment">
+<!-- 10 Enrollment -->
+<article class="paper flip" id="enrollment" data-shape="cylinder" data-toc="10 Enrollment">
   <div class="wrap paper-grid">
     <div class="paper-text reveal">
-      <p class="paper-no">07</p>
+      <p class="paper-no">10</p>
       <h3 class="paper-title">Student Enrollment &amp; Course Management</h3>
       <p class="paper-sub">A server-rendered records system on MongoDB Atlas.</p>
       <h4 class="h-label">Overview</h4>
@@ -348,28 +445,28 @@
           <p class="role-when">July 2026 – present</p>
           <h3 class="role-title">AI Engineer <span class="role-org">Gems Pathways, Karachi</span></h3>
           <ul>
-            <li>Design and deploy AI and machine-learning services for educational and business products.</li>
-            <li>Build production REST APIs with Python, Flask and FastAPI, deployed with Docker on Linux servers.</li>
-            <li>Integrate AI services into Laravel portals with the backend and frontend teams, and monitor models in production.</li>
-            <li>Automate repetitive workflows with AI-driven tools.</li>
+            <li>Built <a href="#mcq-studio">MCQ Studio</a>, the service behind the company's learning portal that writes chapter-weighted MCQs from textbooks and extracts MCQs from question papers.</li>
+            <li>Built <a href="#portraitpass">PortraitPass</a>, which validates student ID photos and removes their background.</li>
+            <li>Built <a href="#form-filler">Smart Form Filler</a>, which replays one recorded data-entry session for every row of a spreadsheet.</li>
+            <li>Integrate these services with the company's Laravel portals together with the backend and frontend teams.</li>
           </ul>
         </li>
         <li class="role reveal">
           <p class="role-when">October 2025 – June 2026</p>
           <h3 class="role-title">Junior Solution Engineer <span class="role-org">Squarera, Karachi</span></h3>
           <ul>
-            <li>Built and automated enterprise ETL pipelines in Boomi, making data flows more reliable and removing manual handling.</li>
+            <li>Built and automated enterprise ETL integrations between business systems in Boomi.</li>
+            <li>Tested and debugged OData APIs with Postman while building the integrations.</li>
             <li>Optimised complex SQL transformations for faster queries and analytics-ready datasets.</li>
-            <li>Designed maintainable, high-performance data architecture with the engineering team.</li>
           </ul>
         </li>
         <li class="role reveal">
           <p class="role-when">July 2024 – June 2025</p>
           <h3 class="role-title">Freelance Data Scientist <span class="role-org">Online Dimensions, remote</span></h3>
           <ul>
-            <li>Delivered NLP and recommendation models at 94%+ accuracy with 40% faster inference.</li>
-            <li>Automated ML pipelines over 500k+ records, cutting preprocessing time by 30%.</li>
-            <li>Served predictions through Flask and FastAPI endpoints in under 200 ms.</li>
+            <li>Built NLP and recommendation models for client projects and tracked their performance with MLflow.</li>
+            <li>Automated data-preprocessing pipelines over 500k+ records.</li>
+            <li>Served predictions through Flask and FastAPI endpoints with responses under 200 ms.</li>
           </ul>
         </li>
         <li class="role reveal">
@@ -390,76 +487,94 @@
   <div class="wrap">
     <p class="kicker reveal">Skills</p>
     <h2 class="h-sec reveal">What I work with</h2>
-    <p class="sec-intro reveal">Every skill links to where it was used. Numbers refer to the projects above; <em>Exp.</em> means professional experience.</p>
+    <p class="sec-intro reveal">Every skill links to where it was used. Numbers refer to the projects above; <em>Exp.</em> means professional experience and <em>Univ.</em> university work.</p>
     <div class="index-cols">
       <div class="index-group reveal">
         <h3 class="index-head">Agents &amp; language models</h3>
         <ul>
           <li><span>LangGraph</span><i></i><span class="refs"><a href="#support-agent">02</a></span></li>
-          <li><span>LangChain</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#lab">06</a></span></li>
-          <li><span>Retrieval-augmented generation</span><i></i><span class="refs"><a href="#support-agent">02</a></span></li>
+          <li><span>LangChain</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#lab">09</a></span></li>
+          <li><span>Retrieval-augmented generation</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#mcq-studio">03</a></span></li>
           <li><span>Function and tool calling</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
           <li><span>Voice agents, Vapi</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
-          <li><span>Google Gemini</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#lab">06</a></span></li>
+          <li><span>Google Gemini</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#mcq-studio">03</a>, <a href="#lab">09</a></span></li>
+          <li><span>Groq, OpenRouter, Ollama</span><i></i><span class="refs"><a href="#mcq-studio">03</a></span></li>
           <li><span>OpenAI GPT models</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
-          <li><span>Generative AI</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
-          <li><span>Document intelligence</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>Generative AI</span><i></i><span class="refs"><a href="#lab">09</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Document intelligence</span><i></i><span class="refs"><a href="#mcq-studio">03</a>, <a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Machine &amp; deep learning</h3>
         <ul>
-          <li><span>Graph neural networks</span><i></i><span class="refs"><a href="#gnn">03</a></span></li>
-          <li><span>PyTorch, PyTorch Geometric</span><i></i><span class="refs"><a href="#gnn">03</a></span></li>
-          <li><span>TensorFlow, Keras</span><i></i><span class="refs"><a href="#lab">06</a></span></li>
-          <li><span>CNN, RNN, LSTM</span><i></i><span class="refs"><a href="#lab">06</a></span></li>
-          <li><span>Transformers, transfer learning</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
-          <li><span>scikit-learn, XGBoost</span><i></i><span class="refs"><a href="#gnn">03</a>, <a href="#lab">06</a></span></li>
-          <li><span>NLP, computer vision</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
-          <li><span>Recommendation systems</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Graph neural networks</span><i></i><span class="refs"><a href="#gnn">06</a></span></li>
+          <li><span>PyTorch, PyTorch Geometric</span><i></i><span class="refs"><a href="#portraitpass">05</a>, <a href="#gnn">06</a></span></li>
+          <li><span>TensorFlow, Keras</span><i></i><span class="refs"><a href="#lab">09</a></span></li>
+          <li><span>CNN, RNN, LSTM</span><i></i><span class="refs"><a href="#lab">09</a></span></li>
+          <li><span>Transformers</span><i></i><span class="refs"><a href="#portraitpass">05</a>, <a href="#lab">09</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Transfer learning</span><i></i><span class="refs"><a href="#lab">09</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Text embeddings</span><i></i><span class="refs"><a href="#support-agent">02</a>, <a href="#mcq-studio">03</a></span></li>
+          <li><span>scikit-learn, XGBoost</span><i></i><span class="refs"><a href="#gnn">06</a>, <a href="#lab">09</a></span></li>
+          <li><span>NLP</span><i></i><span class="refs"><a href="#mcq-studio">03</a>, <a href="#lab">09</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Recommendation systems</span><i></i><span class="refs"><a href="#lab">09</a>, <a href="#experience">Exp.</a></span></li>
+        </ul>
+      </div>
+      <div class="index-group reveal">
+        <h3 class="index-head">Computer vision</h3>
+        <ul>
+          <li><span>Face detection and recognition</span><i></i><span class="refs"><a href="#attendance">04</a></span></li>
+          <li><span>MediaPipe face and pose</span><i></i><span class="refs"><a href="#portraitpass">05</a></span></li>
+          <li><span>Image segmentation</span><i></i><span class="refs"><a href="#portraitpass">05</a>, <a href="#lab">09</a></span></li>
+          <li><span>OpenCV</span><i></i><span class="refs"><a href="#attendance">04</a>, <a href="#portraitpass">05</a></span></li>
+          <li><span>ONNX Runtime</span><i></i><span class="refs"><a href="#attendance">04</a></span></li>
+          <li><span>CCTV streams, RTSP</span><i></i><span class="refs"><a href="#attendance">04</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Backend &amp; automation</h3>
         <ul>
-          <li><span>FastAPI</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#support-agent">02</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>FastAPI</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#support-agent">02</a>, <a href="#mcq-studio">03</a>, <a href="#portraitpass">05</a>, <a href="#experience">Exp.</a></span></li>
           <li><span>Flask</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
-          <li><span>REST API design</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#experience">Exp.</a></span></li>
-          <li><span>Node.js, Express</span><i></i><span class="refs"><a href="#enrollment">07</a>, <a href="#experience">Exp.</a></span></li>
-          <li><span>Playwright browser automation</span><i></i><span class="refs"><a href="#form-filler">04</a></span></li>
-          <li><span>Streamlit</span><i></i><span class="refs"><a href="#form-filler">04</a></span></li>
+          <li><span>REST API design</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#mcq-studio">03</a>, <a href="#portraitpass">05</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Node.js, Express</span><i></i><span class="refs"><a href="#enrollment">10</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>Playwright browser automation</span><i></i><span class="refs"><a href="#form-filler">07</a></span></li>
+          <li><span>Streamlit</span><i></i><span class="refs"><a href="#mcq-studio">03</a>, <a href="#form-filler">07</a></span></li>
+          <li><span>Desktop apps, Tkinter</span><i></i><span class="refs"><a href="#attendance">04</a></span></li>
           <li><span>Laravel integration</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>Postman, OData APIs</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Data</h3>
         <ul>
-          <li><span>PostgreSQL</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#crawler">05</a></span></li>
-          <li><span>MongoDB</span><i></i><span class="refs"><a href="#enrollment">07</a></span></li>
-          <li><span>SQL optimisation</span><i></i><span class="refs"><a href="#crawler">05</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>PostgreSQL</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#crawler">08</a></span></li>
+          <li><span>MongoDB</span><i></i><span class="refs"><a href="#enrollment">10</a></span></li>
+          <li><span>Vector search, Qdrant</span><i></i><span class="refs"><a href="#mcq-studio">03</a></span></li>
+          <li><span>SQL optimisation</span><i></i><span class="refs"><a href="#crawler">08</a>, <a href="#experience">Exp.</a></span></li>
           <li><span>ETL pipelines, Boomi</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
-          <li><span>GraphQL APIs</span><i></i><span class="refs"><a href="#crawler">05</a></span></li>
-          <li><span>pandas, NumPy, SciPy</span><i></i><span class="refs"><a href="#form-filler">04</a>, <a href="#lab">06</a></span></li>
-          <li><span>Feature engineering</span><i></i><span class="refs"><a href="#lab">06</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>GraphQL APIs</span><i></i><span class="refs"><a href="#crawler">08</a></span></li>
+          <li><span>PDF and Word parsing</span><i></i><span class="refs"><a href="#mcq-studio">03</a></span></li>
+          <li><span>pandas, NumPy, SciPy</span><i></i><span class="refs"><a href="#form-filler">07</a>, <a href="#lab">09</a></span></li>
+          <li><span>Feature engineering</span><i></i><span class="refs"><a href="#lab">09</a>, <a href="#experience">Exp.</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">MLOps &amp; cloud</h3>
         <ul>
-          <li><span>Docker, Linux servers</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
-          <li><span>Kubernetes, MLflow</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
-          <li><span>GitHub Actions</span><i></i><span class="refs"><a href="#crawler">05</a></span></li>
-          <li><span>Vercel</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#support-agent">02</a>, <a href="#enrollment">07</a></span></li>
-          <li><span>AWS, Google Cloud</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
-          <li><span>Automated testing</span><i></i><span class="refs"><a href="#voice-agent">01</a></span></li>
+          <li><span>Docker, Linux servers</span><i></i><span class="refs"><a href="#mcq-studio">03</a>, <a href="#portraitpass">05</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>MLflow</span><i></i><span class="refs"><a href="#experience">Exp.</a></span></li>
+          <li><span>GitHub Actions</span><i></i><span class="refs"><a href="#crawler">08</a></span></li>
+          <li><span>Vercel</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#support-agent">02</a>, <a href="#enrollment">10</a></span></li>
+          <li><span>AWS, Google Cloud</span><i></i><span class="refs"><a href="#about">Univ.</a></span></li>
+          <li><span>Automated testing</span><i></i><span class="refs"><a href="#voice-agent">01</a>, <a href="#mcq-studio">03</a></span></li>
         </ul>
       </div>
       <div class="index-group reveal">
         <h3 class="index-head">Languages</h3>
         <ul>
-          <li><span>Python</span><i></i><span class="refs"><a href="#voice-agent">01–06</a></span></li>
-          <li><span>SQL</span><i></i><span class="refs"><a href="#crawler">05</a>, <a href="#experience">Exp.</a></span></li>
-          <li><span>JavaScript</span><i></i><span class="refs"><a href="#enrollment">07</a></span></li>
+          <li><span>Python</span><i></i><span class="refs"><a href="#voice-agent">01–09</a></span></li>
+          <li><span>SQL</span><i></i><span class="refs"><a href="#crawler">08</a>, <a href="#experience">Exp.</a></span></li>
+          <li><span>JavaScript</span><i></i><span class="refs"><a href="#enrollment">10</a></span></li>
         </ul>
       </div>
     </div>
@@ -485,7 +600,7 @@
           <div>
             <h3 class="h-label">Education</h3>
             <dl class="cv">
-              <dt>2021 – 2025</dt><dd>B.S. Computer Science<br><em>Sukkur IBA University</em></dd>
+              <dt>2021 – 2025</dt><dd>B.S. Computer Science<br><em>Sukkur IBA University</em>, CGPA 3.16 / 4.00</dd>
               <dt>2019 – 2021</dt><dd>F.Sc. Pre-Engineering<br><em>Govt. Islamia Science College</em></dd>
             </dl>
           </div>
@@ -514,7 +629,7 @@
     <ul class="contact-links reveal">
       <li><a href="https://www.linkedin.com/in/ramim-siddiqui" target="_blank" rel="noopener">LinkedIn</a></li>
       <li><a href="https://github.com/Ramim-Siddiqui" target="_blank" rel="noopener">GitHub</a></li>
-      <li><a href="assets/Ramim_Ali_Siddiqui_CV.pdf" download>CV (PDF)</a></li>
+      <li><a href="assets/Ramim_Ali_Siddiqui_CV.pdf?v=20261021" download>CV (PDF)</a></li>
     </ul>
   </div>
 </section>

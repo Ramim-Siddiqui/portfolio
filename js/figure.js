@@ -98,6 +98,15 @@ class Shape {
 /* ------------------------------------------------------------------ */
 /* Sculptures                                                          */
 /* ------------------------------------------------------------------ */
+// A random point on the outline of a rectangle (for sheet and photo frames).
+function edgePoint(s, L, R, B, T) {
+  let d = s.r() * 2 * (R - L + T - B);
+  if (d < R - L) return [L + d, B];
+  if ((d -= R - L) < T - B) return [R, B + d];
+  if ((d -= T - B) < R - L) return [R - d, T];
+  return [L, T - (d - (R - L))];
+}
+
 const builders = {
   // A neural sphere: a lattice of nodes joined by arcs, over a thin shell.
   sphere() {
@@ -300,6 +309,103 @@ const builders = {
     return s.finish();
   },
 
+  // An answer sheet: two columns of questions, four bubbles each, one marked per question.
+  quiz() {
+    const s = new Shape(131), cols = 2, rows = 9, opts = 4, br = 0.16, gap = 0.48, rowH = 0.5, colW = 3.05;
+    const W = cols * colW, H = rows * rowH, top = H / 2, left = -W / 2, qs = cols * rows, mark = [];
+    for (let q = 0; q < qs; q++) mark.push(Math.floor(s.r() * opts));
+    const at = (q, o) => [left + Math.floor(q / rows) * colW + 0.95 + o * gap, top - ((q % rows) + 0.5) * rowH];
+    for (let k = 0; k < N * 0.46; k++) {
+      const b = k % (qs * opts), [x, y] = at(Math.floor(b / opts), b % opts), a = TAU * s.r();
+      s.push(x + Math.cos(a) * br, y + Math.sin(a) * br, s.gauss() * 0.008);
+    }
+    for (let k = 0; k < N * 0.2; k++) {
+      const q = k % qs, [x, y] = at(q, mark[q]), a = TAU * s.r(), r = br * 0.9 * Math.sqrt(s.r());
+      s.push(x + Math.cos(a) * r, y + Math.sin(a) * r, 0.015, { hot: 1 });
+    }
+    for (let k = 0; k < N * 0.1; k++) {
+      const [x, y] = at(k % qs, 0);
+      s.push(x - 0.75 + s.r() * 0.38, y + s.gauss() * 0.012, 0);
+    }
+    for (let k = 0; k < N * 0.08; k++) {
+      const x0 = left + 0.2 + (k % 2) * colW;
+      s.push(x0 + s.r() * (colW - 0.6), top + 0.42 + s.gauss() * 0.01, 0);
+    }
+    while (!s.full) {
+      const [x, y] = edgePoint(s, left - 0.05, left + W - 0.25, -H / 2 - 0.3, top + 0.8);
+      s.push(x + s.gauss() * 0.01, y + s.gauss() * 0.01, -0.02);
+    }
+    return s.rotate(-0.5, 0.28).finish();
+  },
+
+  // A camera's view: lens rings and an aperture, a radar sweep (in the shader) and three tracked faces.
+  lens() {
+    const s = new Shape(141), radii = [0.5, 1.0, 1.55, 2.2], R = 2.2;
+    const ang = (x, y) => (Math.atan2(y, x) / TAU + 1) % 1;
+    for (let k = 0; k < N * 0.42; k++) {
+      const i = k % radii.length, a = TAU * s.r(), r = radii[i] * (1 + s.gauss() * 0.006);
+      s.push(Math.cos(a) * r, Math.sin(a) * r, -i * 0.14, { row: a / TAU });
+    }
+    for (let k = 0; k < N * 0.1; k++) {
+      const a0 = ((k % 6) / 6) * TAU + 0.3, a1 = a0 + TAU / 6, t = s.r(), r = 0.78;
+      const x = Math.cos(a0) * r * (1 - t) + Math.cos(a1) * r * t, y = Math.sin(a0) * r * (1 - t) + Math.sin(a1) * r * t;
+      s.push(x, y, 0.06, { row: ang(x, y) });
+    }
+    const faces = [[1.2, 0.85, 0.5], [-1.3, 0.35, 0.42], [0.25, -1.35, 0.46]];
+    for (let k = 0; k < N * 0.16; k++) {
+      const [cx, cy, h] = faces[k % 3];
+      let x, y;
+      if (s.r() < 0.35) {
+        const a = TAU * s.r(), r = h * 0.28 * Math.sqrt(s.r());
+        x = cx + Math.cos(a) * r; y = cy + Math.sin(a) * r;
+      } else {
+        const c = Math.floor(s.r() * 4), sx = c & 1 ? 1 : -1, sy = c & 2 ? 1 : -1, along = s.r() * h * 0.45;
+        if (s.r() < 0.5) { x = cx + sx * h; y = cy + sy * (h - along); } else { x = cx + sx * (h - along); y = cy + sy * h; }
+      }
+      s.push(x, y, 0.1, { hot: 1, row: -1 });
+    }
+    while (!s.full) {
+      const a = TAU * s.r(), r = R * Math.sqrt(s.r());
+      s.push(Math.cos(a) * r, Math.sin(a) * r, -0.3 + s.gauss() * 0.04, { row: a / TAU });
+    }
+    return s.rotate(-0.3, 0.35).finish();
+  },
+
+  // A head-and-shoulders portrait in a photo frame; the face landmarks are lit.
+  bust() {
+    const s = new Shape(151), hx = 0.78, hy = 0.98, hz = 0.8, hc = 0.72;
+    for (let k = 0; k < N * 0.32; k++) {
+      const th = TAU * s.r(), ph = Math.acos(2 * s.r() - 1);
+      s.push(hx * Math.sin(ph) * Math.cos(th), hc + hy * Math.cos(ph), hz * Math.sin(ph) * Math.sin(th));
+    }
+    for (let k = 0; k < N * 0.05; k++) {
+      const a = TAU * s.r();
+      s.push(Math.cos(a) * 0.33, -0.95 + s.r() * 0.75, Math.sin(a) * 0.3);
+    }
+    for (let k = 0; k < N * 0.3; k++) {
+      const th = TAU * s.r(), ph = Math.acos(s.r());
+      s.push(1.75 * Math.sin(ph) * Math.cos(th), -2.05 + 1.15 * Math.cos(ph), 0.62 * Math.sin(ph) * Math.sin(th));
+    }
+    const marks = [];
+    for (const side of [-1, 1]) {
+      for (let i = 0; i < 14; i++) { const a = (i / 14) * TAU; marks.push([side * 0.3 + Math.cos(a) * 0.13, 0.86 + Math.sin(a) * 0.055]); }
+      for (let i = 0; i < 9; i++) { const t = i / 8; marks.push([side * (0.15 + t * 0.32), 1.06 + Math.sin(t * Math.PI) * 0.06]); }
+    }
+    for (let i = 0; i < 8; i++) marks.push([0, 0.84 - i * 0.045]);
+    for (let i = 0; i < 7; i++) marks.push([-0.09 + i * 0.03, 0.5]);
+    for (let i = 0; i < 15; i++) { const t = i / 14 - 0.5; marks.push([t * 0.44, 0.34 - Math.cos(t * Math.PI) * 0.025]); }
+    for (let i = 0; i < 25; i++) { const a = Math.PI * (1.05 + (i / 24) * 0.9); marks.push([Math.cos(a) * 0.68, hc + Math.sin(a) * 0.88]); }
+    for (let k = 0; k < N * 0.09; k++) {
+      const [x, y] = marks[k % marks.length], u = Math.max(0, 1 - (x / hx) ** 2 - ((y - hc) / hy) ** 2);
+      s.push(x + s.gauss() * 0.008, y + s.gauss() * 0.008, hz * Math.sqrt(u) + 0.02, { hot: 1 });
+    }
+    while (!s.full) {
+      const [x, y] = edgePoint(s, -2.6, 2.6, -2.3, 2.15);
+      s.push(x + s.gauss() * 0.012, y + s.gauss() * 0.012, -0.85);
+    }
+    return s.rotate(0.04, -0.26).finish();
+  },
+
   // "Say hello." sampled from Times New Roman on a hidden canvas.
   text() {
     const s = new Shape(121);
@@ -323,9 +429,9 @@ const builders = {
   },
 };
 const SPIN = { sphere: 0.07, galaxy: 0.05, cluster: 0.09, cylinder: 0.12, helix: 0.16 };
-const UNIFORM_FOR = { wave: "uWave", grid: "uScan", flow: "uFlow", galaxy: "uTwinkle" };
+const UNIFORM_FOR = { wave: "uWave", grid: "uScan", lens: "uScan", flow: "uFlow", galaxy: "uTwinkle" };
 const TILT = { text: 0.03 };
-const HOT = { tree: 1, helix: 1, grid: 0.55, sphere: 0.6, cluster: 0.55, galaxy: 0.7, cylinder: 0.6, text: 0.5 };
+const HOT = { tree: 1, helix: 1, grid: 0.55, sphere: 0.6, cluster: 0.55, galaxy: 0.7, cylinder: 0.6, text: 0.5, quiz: 0.85, lens: 0.9, bust: 0.85 };
 
 /* ------------------------------------------------------------------ */
 /* Renderer                                                            */
@@ -733,8 +839,8 @@ if (renderer) {
     geo.attributes.position.needsUpdate = true;
 
     // 5. Shape-specific effects and rotation.
-    for (const [shapeName, u] of Object.entries(UNIFORM_FOR)) {
-      const want = targetName === shapeName ? 1 : 0;
+    for (const u of ["uWave", "uScan", "uFlow", "uTwinkle"]) {
+      const want = UNIFORM_FOR[targetName] === u ? 1 : 0;
       weights[u] += (want - weights[u]) * Math.min(1, 0.08 * k60);
       uniforms[u].value = weights[u];
     }
